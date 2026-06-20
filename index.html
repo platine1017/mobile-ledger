@@ -35,9 +35,46 @@
       --oc-gold: #F4D9A6;
       --oc-gold-soft: #fff4d9;
       --oc-gold-ink: #75571c;
+      --focus-color: #15ADC1;
+      --focus-glow: rgba(162, 243, 245, .52);
+      --app-bg: linear-gradient(180deg, #f7fbf9 0%, #fff8f1 52%, #f7fafc 100%);
+      --surface-bg: rgba(255, 255, 255, .78);
+      --surface-soft: rgba(255, 255, 255, .68);
+      --surface-pop: rgba(255, 255, 255, .86);
+      --field-bg: #fffefb;
+      --hero-bg: linear-gradient(135deg, #e1f4ef 0%, #fff6dc 54%, #f6e9ff 100%);
+      --nav-bg: rgba(255, 255, 255, .88);
+      --toast-bg: #26313a;
+      --toast-ink: #ffffff;
       --shadow: 0 10px 28px rgba(48, 69, 73, .10);
       --radius: 8px;
       font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --ink: #f5efe8;
+      --muted: #b8c5c8;
+      --line: #35464a;
+      --paper: #151b1d;
+      --wash: #101416;
+      --gray: #334045;
+      --oc-aqua-soft: rgba(162, 243, 245, .15);
+      --oc-rose-soft: rgba(223, 166, 180, .17);
+      --oc-gold-soft: rgba(244, 217, 166, .17);
+      --oc-teal-ink: #b8fbff;
+      --oc-rose-ink: #ffd3dd;
+      --oc-gold-ink: #ffe4a8;
+      --app-bg: linear-gradient(180deg, #0f1719 0%, #171417 48%, #161a13 100%);
+      --surface-bg: rgba(24, 31, 33, .86);
+      --surface-soft: rgba(35, 43, 45, .72);
+      --surface-pop: rgba(29, 37, 39, .94);
+      --field-bg: #111719;
+      --hero-bg: linear-gradient(135deg, rgba(21, 173, 193, .24) 0%, rgba(244, 217, 166, .18) 54%, rgba(223, 166, 180, .2) 100%);
+      --nav-bg: rgba(18, 24, 26, .92);
+      --toast-bg: #f5efe8;
+      --toast-ink: #151b1d;
+      --shadow: 0 14px 30px rgba(0, 0, 0, .30);
     }
 
     * { box-sizing: border-box; }
@@ -45,7 +82,7 @@
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background: linear-gradient(180deg, #f7fbf9 0%, #fff8f1 52%, #f7fafc 100%);
+      background: var(--app-bg);
       letter-spacing: 0;
     }
     button, input, select, textarea { font: inherit; }
@@ -84,7 +121,7 @@
       text-align: center;
       font-size: 13px;
       color: var(--oc-teal-ink);
-      background: rgba(255, 255, 255, .76);
+      background: var(--surface-pop);
       border: 1px solid rgba(21, 173, 193, .24);
       box-shadow: 0 6px 16px rgba(65, 93, 101, .08);
     }
@@ -95,7 +132,7 @@
     .hero {
       padding: 16px;
       border-radius: var(--radius);
-      background: linear-gradient(135deg, #e1f4ef 0%, #fff6dc 54%, #f6e9ff 100%);
+      background: var(--hero-bg);
       border: 1px solid rgba(129, 159, 154, .25);
       box-shadow: var(--shadow);
     }
@@ -128,7 +165,7 @@
       margin-top: 12px;
     }
     .summary-controls input {
-      background: rgba(255, 255, 255, .82);
+      background: var(--surface-pop);
     }
     .summary-actions {
       display: grid;
@@ -163,7 +200,7 @@
       min-height: 36px;
       padding: 8px 11px;
       border-radius: 999px;
-      background: rgba(255,255,255,.74);
+      background: var(--surface-pop);
       border: 1px solid var(--line);
       color: var(--muted);
       font-size: 13px;
@@ -177,8 +214,8 @@
     .mini {
       padding: 12px;
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, .68);
-      border: 1px solid rgba(255, 255, 255, .8);
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
     }
     .mini span {
       display: block;
@@ -194,7 +231,7 @@
       margin-top: 16px;
       padding: 14px;
       border-radius: var(--radius);
-      background: rgba(255, 255, 255, .78);
+      background: var(--surface-bg);
       border: 1px solid var(--line);
       box-shadow: 0 8px 18px rgba(46, 64, 70, .06);
     }
@@ -232,7 +269,7 @@
       min-height: 44px;
       padding: 10px 11px;
       color: var(--ink);
-      background: #fffefb;
+      background: var(--field-bg);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       outline: none;
@@ -242,8 +279,8 @@
       resize: vertical;
     }
     input:focus, select:focus, textarea:focus {
-      border-color: var(--oc-teal);
-      box-shadow: 0 0 0 3px rgba(162, 243, 245, .52);
+      border-color: var(--focus-color);
+      box-shadow: 0 0 0 3px var(--focus-glow);
     }
     .row {
       display: grid;
@@ -282,7 +319,7 @@
       display: inline-grid;
       place-items: center;
       border-radius: var(--radius);
-      background: #f7fbf9;
+      background: var(--surface-soft);
       border: 1px solid rgba(21, 173, 193, .16);
       font-weight: 900;
     }
@@ -307,7 +344,7 @@
     }
     .tab.active, .settings-tab.active {
       color: var(--oc-teal-ink);
-      background: linear-gradient(135deg, #fffefb, rgba(162, 243, 245, .22));
+      background: linear-gradient(135deg, var(--field-bg), rgba(162, 243, 245, .22));
       box-shadow: 0 4px 12px rgba(21, 173, 193, .12);
       outline: 1px solid rgba(21, 173, 193, .22);
     }
@@ -326,7 +363,7 @@
       padding: 8px 11px;
       border-radius: 999px;
       border: 1px solid var(--line);
-      background: #fffefb;
+      background: var(--field-bg);
       color: var(--ink);
       font-size: 13px;
       font-weight: 800;
@@ -345,8 +382,8 @@
       margin-top: 10px;
       padding: 10px;
       border-radius: var(--radius);
-      background: #f7fbf9;
-      border: 1px dashed #c7d9d6;
+      background: var(--surface-soft);
+      border: 1px dashed var(--line);
     }
     .preview span {
       display: block;
@@ -372,9 +409,9 @@
       padding: 18px 10px;
       text-align: center;
       color: var(--muted);
-      border: 1px dashed #cfdedc;
+      border: 1px dashed var(--line);
       border-radius: var(--radius);
-      background: #fbfefc;
+      background: var(--surface-soft);
     }
     .item {
       display: grid;
@@ -383,7 +420,7 @@
       align-items: center;
       padding: 11px;
       border-radius: var(--radius);
-      background: #fffefb;
+      background: var(--field-bg);
       border: 1px solid var(--line);
     }
     .item-main { min-width: 0; }
@@ -422,15 +459,27 @@
       white-space: nowrap;
       font-size: 11px;
       font-weight: 850;
-      color: #374148;
+      color: var(--ink);
       background: var(--gray);
     }
     .swatch {
       width: 30px;
       height: 30px;
       border-radius: 999px;
-      border: 2px solid #fff;
+      border: 2px solid var(--field-bg);
       box-shadow: 0 0 0 1px var(--line);
+    }
+    .focus-demo {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .focus-demo span {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
     }
     .color-grid {
       display: grid;
@@ -443,7 +492,7 @@
       border-radius: var(--radius);
       border: 2px solid transparent;
     }
-    .color-btn.active { border-color: #26313a; }
+    .color-btn.active { border-color: var(--ink); }
 
     .split-row {
       display: grid;
@@ -475,15 +524,15 @@
       height: 30px;
       padding: 3px;
       border-radius: 999px;
-      background: #d7dfdf;
-      border: 1px solid #c5d0d0;
+      background: var(--gray);
+      border: 1px solid var(--line);
     }
     .switch span {
       display: block;
       width: 22px;
       height: 22px;
       border-radius: 50%;
-      background: #fff;
+      background: var(--field-bg);
       box-shadow: 0 2px 5px rgba(0,0,0,.12);
       transition: transform .18s ease;
     }
@@ -496,7 +545,7 @@
     .reminder-card {
       padding: 12px;
       border-radius: var(--radius);
-      background: #fff7dd;
+      background: var(--oc-gold-soft);
       border: 1px solid #efd999;
     }
     .reminder-card + .reminder-card { margin-top: 8px; }
@@ -514,7 +563,7 @@
       padding: 12px;
       border-radius: var(--radius);
       border: 1px solid var(--line);
-      background: #fffefb;
+      background: var(--field-bg);
     }
     .budget-card + .budget-card,
     .summary-card + .summary-card { margin-top: 8px; }
@@ -582,14 +631,14 @@
       height: 8px;
       margin-top: 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,.6);
+      background: var(--surface-soft);
       overflow: hidden;
     }
     .progress span {
       display: block;
       height: 100%;
       border-radius: inherit;
-      background: rgba(38,49,58,.42);
+      background: var(--muted);
     }
     .modal-backdrop {
       position: fixed;
@@ -599,7 +648,7 @@
       align-items: center;
       justify-content: center;
       padding: 20px;
-      background: rgba(38, 49, 58, .28);
+      background: rgba(12, 18, 20, .42);
       backdrop-filter: blur(8px);
     }
     .modal-backdrop.show { display: flex; }
@@ -609,7 +658,7 @@
       overflow: auto;
       padding: 16px;
       border-radius: var(--radius);
-      background: #fffdf8;
+      background: var(--paper);
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
     }
@@ -641,7 +690,7 @@
       gap: 4px;
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
       transform: translateX(-50%);
-      background: rgba(255, 253, 248, .94);
+      background: var(--nav-bg);
       border-top: 1px solid var(--line);
       backdrop-filter: blur(14px);
     }
@@ -681,8 +730,8 @@
       opacity: 0;
       pointer-events: none;
       text-align: center;
-      color: #fff;
-      background: #26313a;
+      color: var(--toast-ink);
+      background: var(--toast-bg);
       transition: opacity .2s ease, transform .2s ease;
       font-size: 14px;
     }
@@ -958,6 +1007,7 @@
           <button class="settings-tab" data-settings="shortcuts">快捷</button>
           <button class="settings-tab" data-settings="reminders">提醒</button>
           <button class="settings-tab" data-settings="budgets">預算</button>
+          <button class="settings-tab" data-settings="appearance">外觀</button>
           <button class="settings-tab" data-settings="backup">備份</button>
         </div>
 
@@ -1166,6 +1216,36 @@
           <div class="list" id="budgetSettingList"></div>
         </div>
 
+        <div class="settings-pane" id="settings-appearance">
+          <div class="section-head">
+            <div>
+              <h2>外觀設定</h2>
+              <p>切換深色模式；輸入框 focus 會隨機使用 OC 四色。</p>
+            </div>
+          </div>
+          <div class="list">
+            <article class="item">
+              <div class="item-main">
+                <div class="item-title"><strong>深色模式</strong></div>
+                <div class="item-sub">適合夜間使用，設定會保存在本機。</div>
+              </div>
+              <button class="switch" id="darkModeSwitch" title="切換深色模式" type="button"><span></span></button>
+            </article>
+            <article class="item">
+              <div class="item-main">
+                <div class="item-title"><strong>Focus 互動色</strong></div>
+                <div class="item-sub">每次點進輸入框，會在青、水、玫、金四色中隨機切換。</div>
+              </div>
+              <div class="focus-demo" aria-hidden="true">
+                <span style="background:#15ADC1"></span>
+                <span style="background:#A2F3F5"></span>
+                <span style="background:#DFA6B4"></span>
+                <span style="background:#F4D9A6"></span>
+              </div>
+            </article>
+          </div>
+        </div>
+
         <div class="settings-pane" id="settings-backup">
           <div class="section-head">
             <div>
@@ -1237,6 +1317,12 @@
       { id: "lemon", name: "奶黃", bg: "#ffe9a8", ink: "#715b17" },
       { id: "rose", name: "粉玫", bg: "#ffd5dd", ink: "#854d5b" },
       { id: "gray", name: "淺灰", bg: "#e8ecef", ink: "#59636c" }
+    ];
+    const focusTones = [
+      { color: "#15ADC1", glow: "rgba(21, 173, 193, .30)" },
+      { color: "#A2F3F5", glow: "rgba(162, 243, 245, .52)" },
+      { color: "#DFA6B4", glow: "rgba(223, 166, 180, .36)" },
+      { color: "#F4D9A6", glow: "rgba(244, 217, 166, .46)" }
     ];
     const defaultCategories = [
       { id: "food", name: "餐飲", tone: "peach", builtIn: true, words: ["餐", "午餐", "晚餐", "早餐", "便當", "咖啡", "奶茶", "飲料", "宵夜", "飯", "麵", "甜點", "外賣"] },
@@ -1359,7 +1445,7 @@
         reminders: mergeById(defaultReminders, saved.reminders || []),
         budgets: Array.isArray(saved.budgets) ? saved.budgets : [],
         summaryDismissals: saved.summaryDismissals || {},
-        ui: { budgetAlertsExpanded: false, ...(saved.ui || {}) }
+        ui: { budgetAlertsExpanded: false, theme: "light", ...(saved.ui || {}) }
       };
       return next;
     }
@@ -1372,6 +1458,21 @@
     }
     function saveState() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function applyTheme() {
+      const theme = state.ui?.theme === "dark" ? "dark" : "light";
+      document.documentElement.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#151b1d" : "#15ADC1");
+      const toggle = $("#darkModeSwitch");
+      if (toggle) {
+        toggle.classList.toggle("on", theme === "dark");
+        toggle.setAttribute("aria-pressed", String(theme === "dark"));
+      }
+    }
+    function randomizeFocusTone() {
+      const tone = focusTones[Math.floor(Math.random() * focusTones.length)];
+      document.documentElement.style.setProperty("--focus-color", tone.color);
+      document.documentElement.style.setProperty("--focus-glow", tone.glow);
     }
     function backupPayload() {
       return {
@@ -1409,7 +1510,7 @@
         reminders: mergeById(defaultReminders, data.reminders || []),
         budgets: Array.isArray(data.budgets) ? data.budgets : [],
         summaryDismissals: data.summaryDismissals || {},
-        ui: { budgetAlertsExpanded: false, ...(data.ui || {}) }
+        ui: { budgetAlertsExpanded: false, theme: "light", ...(data.ui || {}) }
       };
     }
     async function importBackupFile(file) {
@@ -1425,6 +1526,7 @@
         clearItemsForm();
         clearCategoryForm();
         clearKeywordForm();
+        applyTheme();
         render();
         showToast("已匯入備份");
       } catch (error) {
@@ -2163,6 +2265,14 @@
       $$(".nav-btn").forEach((btn) => btn.addEventListener("click", () => switchView(btn.dataset.view)));
       $$(".tab").forEach((tab) => tab.addEventListener("click", () => switchPane(tab.dataset.pane)));
       $$(".settings-tab").forEach((tab) => tab.addEventListener("click", () => switchSettings(tab.dataset.settings)));
+      document.body.addEventListener("focusin", (event) => {
+        if (event.target.matches("input, select, textarea")) randomizeFocusTone();
+      });
+      $("#darkModeSwitch")?.addEventListener("click", () => {
+        state.ui = { ...(state.ui || {}), theme: state.ui?.theme === "dark" ? "light" : "dark" };
+        applyTheme();
+        saveState();
+      });
 
       $("#quickText").addEventListener("input", renderQuickPreview);
       document.body.addEventListener("click", (event) => {
@@ -2572,6 +2682,7 @@
       $("#filterLimit").value = "100";
       selectedSummaryMonthKeys = [monthKey()];
       addSplitRow();
+      applyTheme();
       bindEvents();
       processRecurring();
       clearForm();
