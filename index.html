@@ -59,22 +59,97 @@
       --paper: #151b1d;
       --wash: #101416;
       --gray: #334045;
-      --oc-aqua-soft: rgba(162, 243, 245, .15);
-      --oc-rose-soft: rgba(223, 166, 180, .17);
-      --oc-gold-soft: rgba(244, 217, 166, .17);
+      --oc-aqua-soft: rgba(162, 243, 245, .12);
+      --oc-rose-soft: rgba(223, 166, 180, .14);
+      --oc-gold-soft: rgba(244, 217, 166, .14);
       --oc-teal-ink: #b8fbff;
       --oc-rose-ink: #ffd3dd;
       --oc-gold-ink: #ffe4a8;
       --app-bg: linear-gradient(180deg, #0f1719 0%, #171417 48%, #161a13 100%);
-      --surface-bg: rgba(24, 31, 33, .86);
-      --surface-soft: rgba(35, 43, 45, .72);
-      --surface-pop: rgba(29, 37, 39, .94);
-      --field-bg: #111719;
-      --hero-bg: linear-gradient(135deg, rgba(21, 173, 193, .24) 0%, rgba(244, 217, 166, .18) 54%, rgba(223, 166, 180, .2) 100%);
+      --surface-bg: rgba(22, 32, 35, .88);
+      --surface-soft: rgba(27, 40, 43, .76);
+      --surface-pop: rgba(18, 29, 32, .94);
+      --field-bg: #0e1416;
+      --hero-bg: linear-gradient(135deg, rgba(21, 173, 193, .18) 0%, rgba(244, 217, 166, .10) 54%, rgba(223, 166, 180, .14) 100%);
       --nav-bg: rgba(18, 24, 26, .92);
       --toast-bg: #f5efe8;
       --toast-ink: #151b1d;
       --shadow: 0 14px 30px rgba(0, 0, 0, .30);
+    }
+
+    :root[data-theme="dark"] .hero {
+      border-color: rgba(162, 243, 245, .16);
+    }
+    :root[data-theme="dark"] .band {
+      border-color: rgba(162, 243, 245, .14);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, .22);
+    }
+    :root[data-theme="dark"] .btn {
+      color: #dffeff;
+      background: rgba(162, 243, 245, .13);
+      border-color: rgba(162, 243, 245, .20);
+    }
+    :root[data-theme="dark"] .btn.primary {
+      color: #e6ffff;
+      background: linear-gradient(135deg, rgba(162, 243, 245, .24), rgba(244, 217, 166, .16));
+      border-color: rgba(162, 243, 245, .28);
+    }
+    :root[data-theme="dark"] .btn.warn {
+      color: #ffdbe3;
+      background: linear-gradient(135deg, rgba(223, 166, 180, .18), rgba(244, 217, 166, .10));
+      border-color: rgba(223, 166, 180, .26);
+    }
+    :root[data-theme="dark"] .summary-actions .btn {
+      background: rgba(162, 243, 245, .14);
+      border-color: rgba(162, 243, 245, .18);
+    }
+    :root[data-theme="dark"] .month-chip-btn {
+      background: #111d20;
+      border-color: rgba(162, 243, 245, .12);
+      color: #b8c5c8;
+    }
+    :root[data-theme="dark"] .month-chip-btn.active {
+      background: linear-gradient(135deg, rgba(162, 243, 245, .42), rgba(21, 173, 193, .28));
+      border-color: rgba(162, 243, 245, .46);
+      color: #ddfeff;
+      box-shadow: inset 0 0 0 1px rgba(221, 254, 255, .08), 0 8px 18px rgba(21, 173, 193, .14);
+    }
+    :root[data-theme="dark"] .tabs,
+    :root[data-theme="dark"] .settings-tabs {
+      background: linear-gradient(135deg, rgba(162, 243, 245, .16), rgba(244, 217, 166, .10) 52%, rgba(223, 166, 180, .12));
+    }
+    :root[data-theme="dark"] .tab.active,
+    :root[data-theme="dark"] .settings-tab.active {
+      background: linear-gradient(135deg, rgba(162, 243, 245, .18), rgba(244, 217, 166, .10));
+      outline-color: rgba(162, 243, 245, .20);
+    }
+    :root[data-theme="dark"] #reminderBand {
+      color: #fff0c7;
+      background: linear-gradient(135deg, #2b2517, #3a301b);
+      border-color: rgba(244, 217, 166, .35);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, .24);
+    }
+    :root[data-theme="dark"] #reminderBand .section-head p,
+    :root[data-theme="dark"] #reminderBand .reminder-card p {
+      color: rgba(255, 240, 199, .78);
+    }
+    :root[data-theme="dark"] .reminder-card {
+      background: rgba(14, 20, 22, .42);
+      border-color: rgba(244, 217, 166, .22);
+    }
+    :root[data-theme="dark"] .reminder-card .btn.primary {
+      color: #ddfeff;
+      background: rgba(162, 243, 245, .22);
+      border-color: rgba(162, 243, 245, .30);
+    }
+    :root[data-theme="dark"] .reminder-card .btn:not(.primary) {
+      color: #f8e3b1;
+      background: rgba(244, 217, 166, .14);
+      border-color: rgba(244, 217, 166, .22);
+    }
+    :root[data-theme="dark"] .nav-btn.active {
+      background: linear-gradient(135deg, rgba(162, 243, 245, .16), rgba(244, 217, 166, .12) 55%, rgba(223, 166, 180, .10));
+      box-shadow: inset 0 0 0 1px rgba(162, 243, 245, .16);
     }
 
     * { box-sizing: border-box; }

@@ -1,4 +1,4 @@
-const CACHE_NAME = "qieqie-ledger-v5";
+const CACHE_NAME = "qieqie-ledger-v6";
 const APP_ASSETS = [
   "./",
   "./index.html",
