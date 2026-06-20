@@ -1,0 +1,2599 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#15ADC1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="茄茄記帳">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <title>茄茄記帳</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #26313a;
+      --muted: #687782;
+      --line: #dfe8e8;
+      --paper: #fffdf8;
+      --wash: #f6fbf9;
+      --blue: #b8dff4;
+      --mint: #ccebdc;
+      --peach: #ffd8c7;
+      --lav: #ddd4f3;
+      --lemon: #ffe9a8;
+      --rose: #ffd5dd;
+      --gray: #e8ecef;
+      --oc-teal: #15ADC1;
+      --oc-aqua: #A2F3F5;
+      --oc-aqua-soft: #e7fbfb;
+      --oc-teal-ink: #075e68;
+      --oc-rose: #DFA6B4;
+      --oc-rose-soft: #f7e2e8;
+      --oc-rose-ink: #7d4050;
+      --oc-gold: #F4D9A6;
+      --oc-gold-soft: #fff4d9;
+      --oc-gold-ink: #75571c;
+      --shadow: 0 10px 28px rgba(48, 69, 73, .10);
+      --radius: 8px;
+      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background: linear-gradient(180deg, #f7fbf9 0%, #fff8f1 52%, #f7fafc 100%);
+      letter-spacing: 0;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { border: 0; cursor: pointer; color: inherit; }
+
+    .app {
+      width: min(100%, 560px);
+      min-height: 100vh;
+      margin: 0 auto;
+      padding: 18px 16px calc(86px + env(safe-area-inset-bottom));
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0 14px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.15;
+      font-weight: 850;
+      color: var(--oc-teal-ink);
+    }
+    .brand span {
+      display: block;
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .month-chip {
+      min-width: 92px;
+      padding: 9px 10px;
+      border-radius: 999px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--oc-teal-ink);
+      background: rgba(255, 255, 255, .76);
+      border: 1px solid rgba(21, 173, 193, .24);
+      box-shadow: 0 6px 16px rgba(65, 93, 101, .08);
+    }
+
+    .view, .pane, .settings-pane { display: none; }
+    .view.active, .pane.active, .settings-pane.active { display: block; }
+
+    .hero {
+      padding: 16px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, #e1f4ef 0%, #fff6dc 54%, #f6e9ff 100%);
+      border: 1px solid rgba(129, 159, 154, .25);
+      box-shadow: var(--shadow);
+    }
+    #reminderBand {
+      background: #fff4c8;
+      border-color: #edd27b;
+    }
+    #reminderBand .section-head p { color: #725b15; }
+    .hero-label {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .balance {
+      margin: 0;
+      font-size: 34px;
+      line-height: 1.1;
+      font-weight: 850;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .summary-controls {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .summary-controls input {
+      background: rgba(255, 255, 255, .82);
+    }
+    .summary-actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .summary-actions .btn {
+      min-height: 36px;
+      padding: 7px 8px;
+      font-size: 12px;
+    }
+    .month-picker {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      max-width: 100%;
+      min-width: 0;
+      padding: 2px 16px 4px 0;
+      overscroll-behavior-x: contain;
+      scroll-padding-right: 18px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .month-picker::-webkit-scrollbar { display: none; }
+    .month-picker::after {
+      content: "";
+      flex: 0 0 10px;
+    }
+    .month-chip-btn {
+      flex: 0 0 auto;
+      white-space: nowrap;
+      min-height: 36px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.74);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .month-chip-btn.active {
+      background: var(--oc-aqua);
+      color: var(--oc-teal-ink);
+      border-color: rgba(21, 173, 193, .42);
+    }
+    .mini {
+      padding: 12px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .68);
+      border: 1px solid rgba(255, 255, 255, .8);
+    }
+    .mini span {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .mini strong { font-size: 18px; }
+    .income { color: #2f6d55; }
+    .expense { color: #9a4a38; }
+
+    .band {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 18px rgba(46, 64, 70, .06);
+    }
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .section-head h2 {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.2;
+    }
+    .section-head p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    input, select, textarea {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 11px;
+      color: var(--ink);
+      background: #fffefb;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      outline: none;
+    }
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--oc-teal);
+      box-shadow: 0 0 0 3px rgba(162, 243, 245, .52);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+    .btn {
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: var(--radius);
+      font-weight: 850;
+      color: var(--oc-teal-ink);
+      background: var(--oc-aqua-soft);
+      border: 1px solid rgba(21, 173, 193, .22);
+    }
+    .btn.primary {
+      color: var(--oc-teal-ink);
+      background: linear-gradient(135deg, var(--oc-aqua), rgba(244, 217, 166, .66));
+      border-color: rgba(21, 173, 193, .34);
+    }
+    .btn.warn {
+      color: var(--oc-rose-ink);
+      background: linear-gradient(135deg, var(--oc-rose-soft), rgba(244, 217, 166, .54));
+      border-color: rgba(223, 166, 180, .48);
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: var(--radius);
+      background: #f7fbf9;
+      border: 1px solid rgba(21, 173, 193, .16);
+      font-weight: 900;
+    }
+
+    .tabs, .settings-tabs {
+      display: grid;
+      gap: 6px;
+      padding: 4px;
+      margin-bottom: 12px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(162, 243, 245, .34), rgba(244, 217, 166, .30) 52%, rgba(223, 166, 180, .22));
+    }
+    .tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .settings-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tab, .settings-tab {
+      min-height: 38px;
+      border-radius: 6px;
+      color: var(--muted);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 850;
+    }
+    .tab.active, .settings-tab.active {
+      color: var(--oc-teal-ink);
+      background: linear-gradient(135deg, #fffefb, rgba(162, 243, 245, .22));
+      box-shadow: 0 4px 12px rgba(21, 173, 193, .12);
+      outline: 1px solid rgba(21, 173, 193, .22);
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 8px;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      flex: 0 0 auto;
+      min-height: 36px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #fffefb;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 800;
+    }
+    .chip:hover,
+    .month-chip-btn:hover,
+    .icon-btn:hover {
+      border-color: rgba(21, 173, 193, .36);
+      box-shadow: 0 4px 12px rgba(21, 173, 193, .08);
+    }
+
+    .preview {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: var(--radius);
+      background: #f7fbf9;
+      border: 1px dashed #c7d9d6;
+    }
+    .preview span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .preview strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-top: 2px;
+      font-size: 14px;
+    }
+
+    .list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .empty {
+      margin: 0;
+      padding: 18px 10px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed #cfdedc;
+      border-radius: var(--radius);
+      background: #fbfefc;
+    }
+    .item {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 11px;
+      border-radius: var(--radius);
+      background: #fffefb;
+      border: 1px solid var(--line);
+    }
+    .item-main { min-width: 0; }
+    .item-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .item-title strong {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 15px;
+    }
+    .item-sub {
+      margin-top: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .amount {
+      font-weight: 850;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+    .pill {
+      flex: 0 0 auto;
+      max-width: 92px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 11px;
+      font-weight: 850;
+      color: #374148;
+      background: var(--gray);
+    }
+    .swatch {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 1px var(--line);
+    }
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(34px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .color-btn {
+      min-height: 36px;
+      border-radius: var(--radius);
+      border: 2px solid transparent;
+    }
+    .color-btn.active { border-color: #26313a; }
+
+    .split-row {
+      display: grid;
+      grid-template-columns: 1fr 92px 40px;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 8px;
+    }
+    .total-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0 2px;
+      font-weight: 850;
+    }
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .recurring-form, .settings-form {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .switch {
+      width: 50px;
+      height: 30px;
+      padding: 3px;
+      border-radius: 999px;
+      background: #d7dfdf;
+      border: 1px solid #c5d0d0;
+    }
+    .switch span {
+      display: block;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,.12);
+      transition: transform .18s ease;
+    }
+    .switch.on {
+      background: linear-gradient(135deg, var(--oc-aqua), var(--oc-gold));
+      border-color: var(--oc-teal);
+    }
+    .switch.on span { transform: translateX(20px); }
+
+    .reminder-card {
+      padding: 12px;
+      border-radius: var(--radius);
+      background: #fff7dd;
+      border: 1px solid #efd999;
+    }
+    .reminder-card + .reminder-card { margin-top: 8px; }
+    .reminder-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .reminder-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .budget-card,
+    .summary-card {
+      padding: 12px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fffefb;
+    }
+    .budget-card + .budget-card,
+    .summary-card + .summary-card { margin-top: 8px; }
+    .budget-card strong,
+    .summary-card strong {
+      display: block;
+      margin-bottom: 4px;
+    }
+    .budget-card p,
+    .summary-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .budget-card.level-60 { filter: saturate(.95); }
+    .budget-card.level-80 { filter: saturate(1.15); }
+    .budget-card.level-100 { filter: saturate(1.35); box-shadow: 0 0 0 2px rgba(154, 74, 56, .16) inset; }
+    .budget-alert-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .budget-alert-head p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .budget-chip-list {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .budget-chip-list::-webkit-scrollbar { display: none; }
+    .budget-alert-chip {
+      flex: 0 0 auto;
+      display: grid;
+      gap: 2px;
+      min-width: 92px;
+      max-width: 132px;
+      min-height: 54px;
+      padding: 8px 10px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      text-align: left;
+      font-weight: 850;
+    }
+    .budget-alert-chip span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .budget-alert-chip small {
+      color: inherit;
+      opacity: .82;
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .progress {
+      height: 8px;
+      margin-top: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.6);
+      overflow: hidden;
+    }
+    .progress span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: rgba(38,49,58,.42);
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(38, 49, 58, .28);
+      backdrop-filter: blur(8px);
+    }
+    .modal-backdrop.show { display: flex; }
+    .modal {
+      width: min(100%, 430px);
+      max-height: min(78vh, 680px);
+      overflow: auto;
+      padding: 16px;
+      border-radius: var(--radius);
+      background: #fffdf8;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+    .modal h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .modal-list {
+      display: grid;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .modal-line {
+      padding: 9px 10px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, var(--oc-aqua-soft), rgba(244, 217, 166, .26));
+      border: 1px solid rgba(21, 173, 193, .16);
+      font-size: 13px;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 20;
+      width: min(100%, 560px);
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 4px;
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+      transform: translateX(-50%);
+      background: rgba(255, 253, 248, .94);
+      border-top: 1px solid var(--line);
+      backdrop-filter: blur(14px);
+    }
+    .nav-btn {
+      min-height: 54px;
+      display: grid;
+      place-items: center;
+      gap: 2px;
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: transparent;
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .nav-btn b {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 20px;
+      font-size: 18px;
+      line-height: 1;
+    }
+    .nav-btn.active {
+      color: var(--oc-teal-ink);
+      background: linear-gradient(135deg, var(--oc-aqua-soft), rgba(244, 217, 166, .38) 55%, rgba(223, 166, 180, .22));
+      box-shadow: inset 0 0 0 1px rgba(21, 173, 193, .18);
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(82px + env(safe-area-inset-bottom));
+      z-index: 30;
+      width: min(calc(100% - 32px), 420px);
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      transform: translateX(-50%) translateY(14px);
+      opacity: 0;
+      pointer-events: none;
+      text-align: center;
+      color: #fff;
+      background: #26313a;
+      transition: opacity .2s ease, transform .2s ease;
+      font-size: 14px;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (min-width: 520px) {
+      .app { padding-top: 26px; }
+      .recurring-form, .settings-form {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0 10px;
+      }
+      .wide { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>茄茄記帳</h1>
+        <span>先記住，再慢慢整理</span>
+      </div>
+      <div class="month-chip" id="monthChip"></div>
+    </header>
+
+    <section class="view active" id="view-home">
+      <div class="hero">
+        <p class="hero-label" id="summaryLabel">本月結餘</p>
+        <p class="balance" id="balanceText">$0</p>
+        <div class="summary-grid">
+          <div class="mini"><span>收入</span><strong class="income" id="incomeText">$0</strong></div>
+          <div class="mini"><span>支出</span><strong class="expense" id="expenseText">$0</strong></div>
+        </div>
+        <div class="summary-controls">
+          <div class="summary-actions">
+            <button class="btn" type="button" data-month-preset="this">本月</button>
+            <button class="btn" type="button" data-month-preset="last">上月</button>
+            <button class="btn" type="button" data-month-preset="3">近 3 月</button>
+            <button class="btn" type="button" data-month-preset="6">近 6 月</button>
+          </div>
+          <div class="month-picker" id="summaryMonthPicker"></div>
+        </div>
+      </div>
+
+      <section class="band" id="budgetAlertBand">
+        <div class="section-head">
+          <div>
+            <h2>超支預警</h2>
+            <p>分類預算達 60% 後提醒</p>
+          </div>
+        </div>
+        <div id="budgetAlertList"></div>
+      </section>
+
+      <section class="band" id="lazySummaryBand">
+        <div class="section-head">
+          <div>
+            <h2>懶人總結</h2>
+            <p>週一看週報，每月 1 號 20:00 看月報</p>
+          </div>
+        </div>
+        <div id="lazySummaryList"></div>
+        <div class="actions">
+          <button class="btn" type="button" data-open-summary="week">看一週總結</button>
+          <button class="btn" type="button" data-open-summary="month">看月份總結</button>
+        </div>
+      </section>
+
+      <section class="band" id="reminderBand">
+        <div class="section-head">
+          <div>
+            <h2>今日提醒</h2>
+            <p>到點沒記就會出現</p>
+          </div>
+        </div>
+        <div id="reminderList"></div>
+      </section>
+
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <h2>快速備忘</h2>
+            <p>先丟一句話</p>
+          </div>
+        </div>
+        <div class="field">
+          <label for="draftText">備忘內容</label>
+          <textarea id="draftText" placeholder="例如：午餐便當 95，或 咖啡 60 請朋友"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="saveDraftBtn">存到備忘</button>
+          <button class="btn" id="parseDraftBtn">解析成紀錄</button>
+        </div>
+      </section>
+
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <h2>待整理</h2>
+            <p id="draftCountText">0 筆備忘</p>
+          </div>
+        </div>
+        <div class="list" id="draftList"></div>
+      </section>
+
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <h2>最近紀錄</h2>
+            <p>最新 5 筆</p>
+          </div>
+        </div>
+        <div class="list" id="recentList"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-add">
+      <section class="band">
+        <div class="tabs">
+          <button class="tab active" data-pane="quick">一句話</button>
+          <button class="tab" data-pane="manual">手動</button>
+          <button class="tab" data-pane="items">列表</button>
+        </div>
+
+        <div class="pane active" id="pane-quick">
+          <div class="section-head">
+            <div>
+              <h2>快速新增</h2>
+              <p>選預設或打一行</p>
+            </div>
+          </div>
+          <div class="chips" id="shortcutChips"></div>
+          <div class="field">
+            <label for="quickText">一句話</label>
+            <textarea id="quickText" placeholder="例如：捷運 22、薪水 30000、搭車 30"></textarea>
+          </div>
+          <div class="preview" id="quickPreview"></div>
+          <div class="actions">
+            <button class="btn" id="fillQuickBtn">填入表單</button>
+            <button class="btn primary" id="saveQuickBtn">直接儲存</button>
+          </div>
+        </div>
+
+        <div class="pane" id="pane-manual">
+          <div class="section-head">
+            <div>
+              <h2 id="manualTitle">手動輸入</h2>
+              <p id="manualHint">可小改再存</p>
+            </div>
+          </div>
+          <form id="transactionForm">
+            <div class="row">
+              <div class="field">
+                <label for="typeInput">類型</label>
+                <select id="typeInput">
+                  <option value="expense">支出</option>
+                  <option value="income">收入</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="amountInput">金額</label>
+                <input id="amountInput" type="number" min="0" step="0.01" placeholder="0">
+              </div>
+            </div>
+            <div class="row">
+              <div class="field">
+                <label for="categoryInput">分類</label>
+                <select id="categoryInput"></select>
+              </div>
+              <div class="field">
+                <label for="dateInput">日期</label>
+                <input id="dateInput" type="date">
+              </div>
+            </div>
+            <div class="field">
+              <label for="titleInput">主題</label>
+              <input id="titleInput" placeholder="可空白，列表會用分類名稱">
+            </div>
+            <div class="field">
+              <label for="noteInput">備註</label>
+              <textarea id="noteInput" placeholder="例如：餅乾 $22；喝的 $11"></textarea>
+            </div>
+            <div class="actions">
+              <button class="btn primary" type="submit" id="transactionSubmitBtn">儲存紀錄</button>
+              <button class="btn" type="button" id="clearFormBtn">清空</button>
+              <button class="btn warn" type="button" id="cancelEditBtn" hidden>取消編輯</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="pane" id="pane-items">
+          <div class="section-head">
+            <div>
+              <h2>列表加總</h2>
+              <p>多項合成一筆</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="itemsCategory">分類</label>
+              <select id="itemsCategory"></select>
+            </div>
+            <div class="field">
+              <label for="itemsDate">日期</label>
+              <input id="itemsDate" type="date">
+            </div>
+          </div>
+          <div id="splitRows"></div>
+          <button class="btn" id="addSplitBtn">加一項</button>
+          <div class="total-line"><span>合計</span><strong id="splitTotal">$0</strong></div>
+          <div class="field">
+            <label for="itemsTitle">主題</label>
+            <input id="itemsTitle" placeholder="可空白，預設用分類名稱">
+          </div>
+          <div class="field">
+            <label for="itemsNote">補充備註</label>
+            <textarea id="itemsNote" placeholder="例如：週末採買、和朋友晚餐"></textarea>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="saveItemsBtn">儲存列表</button>
+            <button class="btn warn" id="cancelItemsEditBtn" hidden>取消編輯</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="view" id="view-records">
+      <section class="band">
+        <div class="section-head">
+          <div>
+            <h2>正式紀錄</h2>
+            <p>可篩選、編輯、刪除</p>
+          </div>
+        </div>
+        <div class="filters">
+          <select id="filterType">
+            <option value="all">全部類型</option>
+            <option value="income">收入</option>
+            <option value="expense">支出</option>
+          </select>
+          <select id="filterCategory">
+            <option value="all">全部分類</option>
+          </select>
+          <input id="filterMonth" type="month" title="篩選月份">
+          <input id="filterDate" type="date" title="指定日期">
+          <select id="filterLimit" title="顯示筆數">
+            <option value="50">最新 50 筆</option>
+            <option value="100" selected>最新 100 筆</option>
+            <option value="200">最新 200 筆</option>
+            <option value="all">全部顯示</option>
+          </select>
+          <button class="btn" id="clearRecordFiltersBtn" type="button">清篩選</button>
+        </div>
+        <div class="summary-grid">
+          <div class="mini"><span>篩選收入</span><strong class="income" id="recordIncomeText">$0</strong></div>
+          <div class="mini"><span>篩選支出</span><strong class="expense" id="recordExpenseText">$0</strong></div>
+        </div>
+        <p class="item-sub" id="recordCountText"></p>
+        <p class="item-sub" id="recordBalanceText"></p>
+        <div class="list" id="recordList"></div>
+      </section>
+    </section>
+
+    <section class="view" id="view-settings">
+      <section class="band">
+        <div class="settings-tabs">
+          <button class="settings-tab active" data-settings="recurring">固定</button>
+          <button class="settings-tab" data-settings="categories">分類</button>
+          <button class="settings-tab" data-settings="keywords">字詞</button>
+          <button class="settings-tab" data-settings="shortcuts">快捷</button>
+          <button class="settings-tab" data-settings="reminders">提醒</button>
+          <button class="settings-tab" data-settings="budgets">預算</button>
+          <button class="settings-tab" data-settings="backup">備份</button>
+        </div>
+
+        <div class="settings-pane active" id="settings-recurring">
+          <div class="section-head">
+            <div>
+              <h2>固定收入與支出</h2>
+              <p>每月自動補上</p>
+            </div>
+          </div>
+          <form id="recurringForm" class="recurring-form">
+            <div class="field wide">
+              <label for="recurringName">名稱</label>
+              <input id="recurringName" placeholder="例如：工資、房租、訂閱費">
+            </div>
+            <div class="field">
+              <label for="recurringType">類型</label>
+              <select id="recurringType">
+                <option value="income">收入</option>
+                <option value="expense">支出</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="recurringAmount">金額</label>
+              <input id="recurringAmount" type="number" min="0" step="0.01" placeholder="0">
+            </div>
+            <div class="field">
+              <label for="recurringCategory">分類</label>
+              <select id="recurringCategory"></select>
+            </div>
+            <div class="field">
+              <label for="recurringDay">每月幾號</label>
+              <input id="recurringDay" type="number" min="1" max="31" value="1">
+            </div>
+            <div class="field wide">
+              <label for="recurringNote">備註</label>
+              <textarea id="recurringNote" placeholder="可空白"></textarea>
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit">新增固定項目</button>
+            </div>
+          </form>
+          <div class="list" id="recurringList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-categories">
+          <div class="section-head">
+            <div>
+              <h2>分類管理</h2>
+              <p>自定分類和顏色</p>
+            </div>
+          </div>
+          <form id="categoryForm" class="settings-form">
+            <div class="field">
+              <label for="categoryName">分類名稱</label>
+              <input id="categoryName" placeholder="例如：寵物、學習">
+            </div>
+            <div class="field">
+              <label for="categoryTone">顏色</label>
+              <input id="categoryTone" type="hidden" value="mint">
+              <div class="color-grid" id="categoryColorGrid"></div>
+            </div>
+            <div class="field wide">
+              <label for="categoryWords">關鍵字</label>
+              <input id="categoryWords" placeholder="用逗號分隔，例如：貓糧,課程">
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit" id="categorySubmitBtn">新增分類</button>
+              <button class="btn warn" type="button" id="cancelCategoryEditBtn" hidden>取消編輯</button>
+            </div>
+          </form>
+          <div class="list" id="categoryList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-keywords">
+          <div class="section-head">
+            <div>
+              <h2>辨識字詞</h2>
+              <p>教它你的用語</p>
+            </div>
+          </div>
+          <form id="keywordForm" class="settings-form">
+            <div class="field">
+              <label for="keywordText">關鍵字</label>
+              <input id="keywordText" placeholder="例如：搭車、茶記">
+            </div>
+            <div class="field">
+              <label for="keywordType">類型</label>
+              <select id="keywordType">
+                <option value="expense">支出</option>
+                <option value="income">收入</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="keywordCategory">分類</label>
+              <select id="keywordCategory"></select>
+            </div>
+            <div class="field">
+              <label for="keywordNote">預設備註</label>
+              <input id="keywordNote" placeholder="可空白">
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit" id="keywordSubmitBtn">新增字詞</button>
+              <button class="btn warn" type="button" id="cancelKeywordEditBtn" hidden>取消編輯</button>
+            </div>
+          </form>
+          <div class="list" id="keywordList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-shortcuts">
+          <div class="section-head">
+            <div>
+              <h2>快捷選項</h2>
+              <p>點一下就預填</p>
+            </div>
+          </div>
+          <form id="shortcutForm" class="settings-form">
+            <div class="field">
+              <label for="shortcutName">名稱</label>
+              <input id="shortcutName" placeholder="例如：早餐">
+            </div>
+            <div class="field">
+              <label for="shortcutType">類型</label>
+              <select id="shortcutType">
+                <option value="expense">支出</option>
+                <option value="income">收入</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="shortcutCategory">分類</label>
+              <select id="shortcutCategory"></select>
+            </div>
+            <div class="field">
+              <label for="shortcutAmount">固定金額</label>
+              <input id="shortcutAmount" type="number" min="0" step="0.01" placeholder="可空白">
+            </div>
+            <div class="field wide">
+              <label for="shortcutNote">備註</label>
+              <input id="shortcutNote" placeholder="預設用名稱">
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit">新增快捷</button>
+            </div>
+          </form>
+          <div class="list" id="shortcutList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-reminders">
+          <div class="section-head">
+            <div>
+              <h2>記帳提醒</h2>
+              <p>打開 app 時檢查</p>
+            </div>
+          </div>
+          <form id="reminderForm" class="settings-form">
+            <div class="field">
+              <label for="reminderName">提醒名稱</label>
+              <input id="reminderName" placeholder="例如：午餐">
+            </div>
+            <div class="field">
+              <label for="reminderTime">觸發時間</label>
+              <input id="reminderTime" type="time" value="12:00">
+            </div>
+            <div class="field">
+              <label for="reminderType">類型</label>
+              <select id="reminderType">
+                <option value="expense">支出</option>
+                <option value="income">收入</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="reminderCategory">分類</label>
+              <select id="reminderCategory"></select>
+            </div>
+            <div class="field wide">
+              <label for="reminderNote">預設備註</label>
+              <input id="reminderNote" placeholder="例如：午餐">
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit">新增提醒</button>
+            </div>
+          </form>
+          <div class="list" id="reminderSettingList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-budgets">
+          <div class="section-head">
+            <div>
+              <h2>分類預算</h2>
+              <p>每月到 60%、80%、100% 會提醒</p>
+            </div>
+          </div>
+          <form id="budgetForm" class="settings-form">
+            <div class="field">
+              <label for="budgetCategory">分類</label>
+              <select id="budgetCategory"></select>
+            </div>
+            <div class="field">
+              <label for="budgetAmount">每月預算</label>
+              <input id="budgetAmount" type="number" min="1" step="0.01" placeholder="例如：3000">
+            </div>
+            <div class="actions wide">
+              <button class="btn primary" type="submit">新增預算</button>
+            </div>
+          </form>
+          <div class="list" id="budgetSettingList"></div>
+        </div>
+
+        <div class="settings-pane" id="settings-backup">
+          <div class="section-head">
+            <div>
+              <h2>備份與安裝</h2>
+              <p>資料保存在本機瀏覽器，記得偶爾匯出</p>
+            </div>
+          </div>
+          <div class="list">
+            <article class="item">
+              <div class="item-main">
+                <div class="item-title"><strong>匯出備份</strong></div>
+                <div class="item-sub">下載一份 JSON，可之後匯入還原。</div>
+              </div>
+              <button class="btn primary" id="exportBackupBtn" type="button">匯出</button>
+            </article>
+            <article class="item">
+              <div class="item-main">
+                <div class="item-title"><strong>匯入備份</strong></div>
+                <div class="item-sub">會覆蓋目前本機資料，匯入前建議先匯出一次。</div>
+              </div>
+              <div class="actions">
+                <input id="importBackupInput" type="file" accept="application/json,.json" hidden>
+                <button class="btn" id="importBackupBtn" type="button">選檔</button>
+              </div>
+            </article>
+            <article class="item">
+              <div class="item-main">
+                <div class="item-title"><strong>加入手機主畫面</strong></div>
+                <div class="item-sub" id="pwaStatusText">已加入 PWA 設定。手機瀏覽器可用分享選單加入主畫面。</div>
+              </div>
+              <button class="btn" id="installPwaBtn" type="button" hidden>安裝</button>
+            </article>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="summaryModal">
+    <div class="modal">
+      <h2 id="summaryModalTitle">懶人總結</h2>
+      <p class="item-sub" id="summaryModalIntro"></p>
+      <div class="modal-list" id="summaryModalList"></div>
+      <div class="actions">
+        <button class="btn primary" id="closeSummaryModal" type="button">知道了</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" aria-label="主要分頁">
+    <button class="nav-btn active" data-view="home"><b>⌂</b><span>總覽</span></button>
+    <button class="nav-btn" data-view="add"><b>＋</b><span>新增</span></button>
+    <button class="nav-btn" data-view="records"><b>≡</b><span>紀錄</span></button>
+    <button class="nav-btn" data-view="settings"><b>⚙</b><span>設定</span></button>
+  </nav>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = "tiny-ledger-v1";
+    const palette = [
+      { id: "oc-aqua", name: "青藍", bg: "#A2F3F5", ink: "#075e68" },
+      { id: "oc-teal", name: "深青", bg: "#15ADC1", ink: "#ffffff" },
+      { id: "oc-rose", name: "柔玫", bg: "#DFA6B4", ink: "#7d4050" },
+      { id: "oc-gold", name: "奶金", bg: "#F4D9A6", ink: "#75571c" },
+      { id: "peach", name: "蜜桃", bg: "#ffd8c7", ink: "#8a4a32" },
+      { id: "mint", name: "薄荷", bg: "#ccebdc", ink: "#2f6d55" },
+      { id: "blue", name: "淡藍", bg: "#b8dff4", ink: "#2d647e" },
+      { id: "lav", name: "淡紫", bg: "#ddd4f3", ink: "#62508b" },
+      { id: "lemon", name: "奶黃", bg: "#ffe9a8", ink: "#715b17" },
+      { id: "rose", name: "粉玫", bg: "#ffd5dd", ink: "#854d5b" },
+      { id: "gray", name: "淺灰", bg: "#e8ecef", ink: "#59636c" }
+    ];
+    const defaultCategories = [
+      { id: "food", name: "餐飲", tone: "peach", builtIn: true, words: ["餐", "午餐", "晚餐", "早餐", "便當", "咖啡", "奶茶", "飲料", "宵夜", "飯", "麵", "甜點", "外賣"] },
+      { id: "transport", name: "交通", tone: "mint", builtIn: true, words: ["捷運", "地鐵", "巴士", "公車", "uber", "的士", "計程車", "油", "交通"] },
+      { id: "shopping", name: "購物", tone: "lav", builtIn: true, words: ["買", "購物", "超市", "日用品", "衣", "鞋", "藥妝"] },
+      { id: "entertainment", name: "娛樂", tone: "blue", builtIn: true, words: ["netflix", "電影", "遊戲", "訂閱", "演唱", "娛樂", "spotify"] },
+      { id: "home", name: "家用", tone: "lemon", builtIn: true, words: ["房租", "租", "水電", "電費", "電話", "網路", "家用"] },
+      { id: "health", name: "健康", tone: "rose", builtIn: true, words: ["醫生", "藥", "牙", "健身", "健康", "診所"] },
+      { id: "income", name: "收入", tone: "blue", builtIn: true, words: ["薪水", "工資", "收入", "獎金", "退款", "分紅", "報銷"] },
+      { id: "other", name: "其他", tone: "gray", builtIn: true, words: [] }
+    ];
+    const defaultShortcuts = [
+      { id: "sc-lunch", name: "午餐", type: "expense", category: "food", amount: "", note: "午餐", builtIn: true },
+      { id: "sc-dinner", name: "晚餐", type: "expense", category: "food", amount: "", note: "晚餐", builtIn: true },
+      { id: "sc-coffee", name: "咖啡", type: "expense", category: "food", amount: "", note: "咖啡", builtIn: true },
+      { id: "sc-mtr", name: "捷運", type: "expense", category: "transport", amount: "", note: "捷運", builtIn: true },
+      { id: "sc-market", name: "超市", type: "expense", category: "shopping", amount: "", note: "超市", builtIn: true },
+      { id: "sc-rent", name: "房租", type: "expense", category: "home", amount: "", note: "房租", builtIn: true },
+      { id: "sc-salary", name: "工資", type: "income", category: "income", amount: "", note: "工資", builtIn: true }
+    ];
+    const defaultReminders = [
+      { id: "rm-lunch", name: "午餐", time: "12:00", type: "expense", category: "food", note: "午餐", active: true, dismissedDates: [], builtIn: true }
+    ];
+    const defaultBudgets = [];
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+    let state = loadState();
+    let selectedSummaryMonthKeys = [];
+    let editingTxId = null;
+    let editingItemsTxId = null;
+    let editingCategoryId = null;
+    let editingKeywordId = null;
+    let toastTimer = null;
+    let deferredInstallPrompt = null;
+
+    function uid(prefix = "id") {
+      return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+    }
+    function todayISO() {
+      return dateISO(new Date());
+    }
+    function money(value) {
+      const number = Number(value || 0);
+      return `$${number.toLocaleString("zh-Hant", { maximumFractionDigits: 2 })}`;
+    }
+    function monthKey(date = new Date()) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    }
+    function dateISO(date) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    }
+    function monthLabel() {
+      const now = new Date();
+      return `${now.getFullYear()} / ${String(now.getMonth() + 1).padStart(2, "0")}`;
+    }
+    function monthLabelFromKey(key) {
+      if (!key) return "本月";
+      const [year, month] = key.split("-");
+      return `${year} / ${month}`;
+    }
+    function addMonths(date, delta) {
+      const next = new Date(date);
+      next.setMonth(next.getMonth() + delta);
+      return next;
+    }
+    function recentMonthKeys(count = 12) {
+      return Array.from({ length: count }, (_, index) => monthKey(addMonths(new Date(), -index)));
+    }
+    function selectedSummaryMonths() {
+      return selectedSummaryMonthKeys.length ? selectedSummaryMonthKeys : [monthKey()];
+    }
+    function toneById(id) {
+      return palette.find((tone) => tone.id === id) || palette[6];
+    }
+    function categoryById(id) {
+      return getCategories().find((cat) => cat.id === id) || getCategories().find((cat) => cat.id === "other");
+    }
+    function getCategories() {
+      return Array.isArray(state.categories) && state.categories.length ? state.categories : defaultCategories;
+    }
+    function getShortcuts() {
+      return Array.isArray(state.shortcuts) ? state.shortcuts : defaultShortcuts;
+    }
+    function getKeywordRules() {
+      return Array.isArray(state.keywordRules) ? state.keywordRules : [];
+    }
+    function getReminders() {
+      return Array.isArray(state.reminders) ? state.reminders : defaultReminders;
+    }
+    function getBudgets() {
+      return Array.isArray(state.budgets) ? state.budgets : defaultBudgets;
+    }
+    function splitWords(value) {
+      return String(value || "").split(/[,，、\s]+/).map((word) => word.trim()).filter(Boolean);
+    }
+    function escapeHTML(text) {
+      return String(text || "").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+      }[char]));
+    }
+    function escapeAttr(text) {
+      return escapeHTML(text).replace(/`/g, "&#096;");
+    }
+
+    function loadState() {
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch (error) {
+        console.warn(error);
+      }
+      const next = {
+        transactions: Array.isArray(saved.transactions) ? saved.transactions : [],
+        drafts: Array.isArray(saved.drafts) ? saved.drafts : [],
+        recurring: Array.isArray(saved.recurring) ? saved.recurring : [],
+        categories: mergeById(defaultCategories, saved.categories || []),
+        keywordRules: Array.isArray(saved.keywordRules) ? saved.keywordRules : [],
+        shortcuts: mergeById(defaultShortcuts, saved.shortcuts || []),
+        reminders: mergeById(defaultReminders, saved.reminders || []),
+        budgets: Array.isArray(saved.budgets) ? saved.budgets : [],
+        summaryDismissals: saved.summaryDismissals || {},
+        ui: { budgetAlertsExpanded: false, ...(saved.ui || {}) }
+      };
+      return next;
+    }
+    function mergeById(defaults, saved) {
+      const map = new Map(defaults.map((item) => [item.id, { ...item }]));
+      saved.forEach((item) => {
+        if (item && item.id) map.set(item.id, { ...map.get(item.id), ...item });
+      });
+      return [...map.values()];
+    }
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function backupPayload() {
+      return {
+        app: "茄茄記帳",
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        state
+      };
+    }
+    function exportBackup() {
+      const payload = JSON.stringify(backupPayload(), null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `qieqie-ledger-backup-${todayISO()}.json`;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      showToast("已匯出備份");
+    }
+    function normalizeImportedState(imported) {
+      const data = imported && imported.state ? imported.state : imported;
+      if (!data || !Array.isArray(data.transactions)) {
+        throw new Error("這不是茄茄記帳備份檔");
+      }
+      return {
+        transactions: Array.isArray(data.transactions) ? data.transactions : [],
+        drafts: Array.isArray(data.drafts) ? data.drafts : [],
+        recurring: Array.isArray(data.recurring) ? data.recurring : [],
+        categories: mergeById(defaultCategories, data.categories || []),
+        keywordRules: Array.isArray(data.keywordRules) ? data.keywordRules : [],
+        shortcuts: mergeById(defaultShortcuts, data.shortcuts || []),
+        reminders: mergeById(defaultReminders, data.reminders || []),
+        budgets: Array.isArray(data.budgets) ? data.budgets : [],
+        summaryDismissals: data.summaryDismissals || {},
+        ui: { budgetAlertsExpanded: false, ...(data.ui || {}) }
+      };
+    }
+    async function importBackupFile(file) {
+      if (!file) return;
+      try {
+        const text = await file.text();
+        const imported = normalizeImportedState(JSON.parse(text));
+        state = imported;
+        saveState();
+        selectedSummaryMonthKeys = [monthKey()];
+        refreshSelects();
+        clearForm();
+        clearItemsForm();
+        clearCategoryForm();
+        clearKeywordForm();
+        render();
+        showToast("已匯入備份");
+      } catch (error) {
+        showToast(error.message || "匯入失敗");
+      }
+    }
+    function showToast(text) {
+      const toast = $("#toast");
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function parseEntry(text) {
+      const clean = text.trim();
+      const amountMatch = clean.match(/(?:\$|＄|hk\$|nt\$)?\s*(-?\d+(?:,\d{3})*(?:\.\d+)?)/i);
+      const amount = amountMatch ? Math.abs(Number(amountMatch[1].replace(/,/g, ""))) : 0;
+      const lower = clean.toLowerCase();
+      let type = "expense";
+      let category = "other";
+      let note = clean;
+
+      const explicit = getKeywordRules().find((rule) => rule.keyword && lower.includes(rule.keyword.toLowerCase()));
+      if (explicit) {
+        type = explicit.type || "expense";
+        category = explicit.category || "other";
+        if (explicit.note && !note) note = explicit.note;
+      } else {
+        const incomeWords = ["薪水", "工資", "收入", "獎金", "退款", "分紅", "報銷"];
+        const isIncome = incomeWords.some((word) => lower.includes(word.toLowerCase()));
+        type = isIncome ? "income" : "expense";
+        category = isIncome ? "income" : "other";
+        for (const cat of getCategories()) {
+          if (cat.id !== "income" && (cat.words || []).some((word) => lower.includes(word.toLowerCase()))) {
+            category = cat.id;
+            break;
+          }
+        }
+        if (isIncome) category = "income";
+      }
+      return { type, amount, category, date: todayISO(), title: "", note };
+    }
+
+    function addTransaction(entry) {
+      const amount = Number(entry.amount);
+      if (!amount || amount <= 0) {
+        showToast("金額要大於 0 才能存");
+        return false;
+      }
+      state.transactions.unshift({
+        id: uid("tx"),
+        type: entry.type || "expense",
+        amount,
+        category: entry.category || "other",
+        date: entry.date || todayISO(),
+        title: (entry.title || "").trim(),
+        note: (entry.note || "").trim(),
+        items: entry.items || [],
+        source: entry.source || "manual",
+        recurringKey: entry.recurringKey || null
+      });
+      saveState();
+      render();
+      return true;
+    }
+    function updateTransaction(id, entry) {
+      const tx = state.transactions.find((item) => item.id === id);
+      const amount = Number(entry.amount);
+      if (!tx || !amount || amount <= 0) {
+        showToast("金額要大於 0 才能存");
+        return false;
+      }
+      Object.assign(tx, {
+        type: entry.type || "expense",
+        amount,
+        category: entry.category || "other",
+        date: entry.date || todayISO(),
+        title: (entry.title || "").trim(),
+        note: (entry.note || "").trim()
+      });
+      if (entry.items !== undefined) tx.items = entry.items;
+      if (entry.source !== undefined) tx.source = entry.source;
+      saveState();
+      render();
+      return true;
+    }
+    function processRecurring() {
+      const now = new Date();
+      const key = monthKey(now);
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      let added = 0;
+      state.recurring.forEach((item) => {
+        if (!item.active) return;
+        const recurringKey = `${item.id}:${key}`;
+        if (state.transactions.some((tx) => tx.recurringKey === recurringKey)) return;
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        const day = Math.min(Number(item.day || 1), lastDay);
+        state.transactions.unshift({
+          id: uid("tx"),
+          type: item.type,
+          amount: Number(item.amount),
+          category: item.category,
+          date: `${key}-${String(day).padStart(2, "0")}`,
+          title: item.name,
+          note: item.note || item.name,
+          items: [],
+          source: "recurring",
+          recurringKey
+        });
+        added += 1;
+      });
+      if (added) {
+        saveState();
+        showToast(`已自動補上 ${added} 筆固定項目`);
+      }
+    }
+
+    function reminderDue(item) {
+      if (!item.active) return false;
+      const today = todayISO();
+      if ((item.dismissedDates || []).includes(today)) return false;
+      const now = new Date();
+      const [hour, minute] = String(item.time || "12:00").split(":").map(Number);
+      const trigger = new Date();
+      trigger.setHours(hour || 0, minute || 0, 0, 0);
+      if (now < trigger) return false;
+      return !state.transactions.some((tx) => {
+        if (tx.date !== today || tx.type !== item.type) return false;
+        const sameCategory = tx.category === item.category;
+        const note = String(tx.note || "");
+        const sameNote = item.note ? note.includes(item.note) : true;
+        return sameCategory && sameNote;
+      });
+    }
+    function dismissReminder(id) {
+      const item = state.reminders.find((entry) => entry.id === id);
+      if (!item) return;
+      item.dismissedDates = [...new Set([...(item.dismissedDates || []), todayISO()])];
+      saveState();
+      renderReminders();
+    }
+
+    function populateSelect(select, includeAll = false) {
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = "";
+      if (includeAll) select.append(new Option("全部分類", "all"));
+      getCategories().forEach((cat) => select.append(new Option(cat.name, cat.id)));
+      if ([...select.options].some((option) => option.value === current)) select.value = current;
+    }
+    function refreshSelects() {
+      ["#categoryInput", "#itemsCategory", "#recurringCategory", "#keywordCategory", "#shortcutCategory", "#reminderCategory", "#budgetCategory"].forEach((id) => populateSelect($(id)));
+      populateSelect($("#filterCategory"), true);
+    }
+
+    function expenseByCategory(start, end) {
+      const totals = {};
+      state.transactions.forEach((tx) => {
+        if (tx.type !== "expense" || !tx.date) return;
+        if (tx.date < start || tx.date > end) return;
+        totals[tx.category] = (totals[tx.category] || 0) + Number(tx.amount || 0);
+      });
+      return totals;
+    }
+    function totalsForRange(start, end) {
+      return state.transactions.reduce((acc, tx) => {
+        if (!tx.date || tx.date < start || tx.date > end) return acc;
+        if (tx.type === "income") acc.income += Number(tx.amount || 0);
+        if (tx.type === "expense") acc.expense += Number(tx.amount || 0);
+        return acc;
+      }, { income: 0, expense: 0 });
+    }
+    function weekRange(offsetWeeks = 0) {
+      const now = new Date();
+      const day = now.getDay() || 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - day + 1 - (offsetWeeks * 7));
+      monday.setHours(0, 0, 0, 0);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      return { start: dateISO(monday), end: dateISO(sunday) };
+    }
+    function monthRange(key) {
+      const [year, month] = key.split("-").map(Number);
+      const start = new Date(year, month - 1, 1);
+      const end = new Date(year, month, 0);
+      return { start: dateISO(start), end: dateISO(end) };
+    }
+    function previousMonthKey(key) {
+      const [year, month] = key.split("-").map(Number);
+      return monthKey(new Date(year, month - 2, 1));
+    }
+    function comparisonLines(current, previous) {
+      const ids = [...new Set([...Object.keys(current), ...Object.keys(previous)])];
+      return ids.map((id) => {
+        const diff = (current[id] || 0) - (previous[id] || 0);
+        return { id, diff, current: current[id] || 0, previous: previous[id] || 0 };
+      }).filter((item) => item.diff !== 0).sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+    }
+    function buildWeekSummary() {
+      const last = weekRange(1);
+      const before = weekRange(2);
+      const lastTotals = totalsForRange(last.start, last.end);
+      const beforeTotals = totalsForRange(before.start, before.end);
+      const currentCats = expenseByCategory(last.start, last.end);
+      const previousCats = expenseByCategory(before.start, before.end);
+      return {
+        kind: "week",
+        title: "一週總結",
+        intro: `${last.start} 到 ${last.end} 支出 ${money(lastTotals.expense)}，比前一週${lastTotals.expense >= beforeTotals.expense ? "多" : "少"} ${money(Math.abs(lastTotals.expense - beforeTotals.expense))}。`,
+        lines: comparisonLines(currentCats, previousCats).slice(0, 6)
+      };
+    }
+    function buildMonthSummary() {
+      const lastMonth = previousMonthKey(monthKey());
+      const beforeMonth = previousMonthKey(lastMonth);
+      const last = monthRange(lastMonth);
+      const before = monthRange(beforeMonth);
+      const lastTotals = totalsForRange(last.start, last.end);
+      const beforeTotals = totalsForRange(before.start, before.end);
+      const currentCats = expenseByCategory(last.start, last.end);
+      const previousCats = expenseByCategory(before.start, before.end);
+      const biggest = Object.entries(currentCats).sort((a, b) => b[1] - a[1])[0];
+      const biggestText = biggest ? `最大支出分類是 ${categoryById(biggest[0]).name} ${money(biggest[1])}。` : "上月還沒有支出紀錄。";
+      return {
+        kind: "month",
+        title: `${monthLabelFromKey(lastMonth)} 月份總結`,
+        intro: `收入 ${money(lastTotals.income)}，支出 ${money(lastTotals.expense)}，結餘 ${money(lastTotals.income - lastTotals.expense)}。${biggestText} 比前一月${lastTotals.expense >= beforeTotals.expense ? "多" : "少"} ${money(Math.abs(lastTotals.expense - beforeTotals.expense))}。`,
+        lines: comparisonLines(currentCats, previousCats).slice(0, 6)
+      };
+    }
+    function summaryLineHTML(item) {
+      const cat = categoryById(item.id);
+      const direction = item.diff > 0 ? "多支出" : "少支出";
+      return `<div class="modal-line"><strong>${escapeHTML(cat.name)}</strong>${direction} ${money(Math.abs(item.diff))}，本期 ${money(item.current)}</div>`;
+    }
+    function openSummaryModal(kind) {
+      const summary = kind === "month" ? buildMonthSummary() : buildWeekSummary();
+      $("#summaryModalTitle").textContent = summary.title;
+      $("#summaryModalIntro").textContent = summary.intro;
+      $("#summaryModalList").innerHTML = summary.lines.length
+        ? summary.lines.map(summaryLineHTML).join("")
+        : `<div class="modal-line">暫時沒有分類變化，安靜也是一種好消息。</div>`;
+      $("#summaryModal").classList.add("show");
+    }
+    function summaryDueCards() {
+      const now = new Date();
+      const today = todayISO();
+      const cards = [];
+      if (now.getDay() === 1 && state.summaryDismissals.week !== today) {
+        cards.push({ kind: "week", title: "一週總結可以看了", text: "看看上週各分類比前一週多花或少花多少。" });
+      }
+      if (now.getDate() === 1 && now.getHours() >= 20 && state.summaryDismissals.month !== monthKey(now)) {
+        cards.push({ kind: "month", title: "月份總結可以看了", text: "看看上個月收入、支出、結餘和最大支出分類。" });
+      }
+      return cards;
+    }
+    function renderSummaryMonthPicker() {
+      const months = recentMonthKeys(12);
+      $("#summaryMonthPicker").innerHTML = months.map((key) => `
+        <button class="month-chip-btn ${selectedSummaryMonths().includes(key) ? "active" : ""}" type="button" data-summary-month="${key}">
+          ${monthLabelFromKey(key)}
+        </button>
+      `).join("");
+    }
+    function renderSummary() {
+      const months = selectedSummaryMonths();
+      const monthTx = state.transactions.filter((tx) => tx.date && months.some((key) => tx.date.startsWith(key)));
+      const income = monthTx.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + Number(tx.amount), 0);
+      const expense = monthTx.filter((tx) => tx.type === "expense").reduce((sum, tx) => sum + Number(tx.amount), 0);
+      $("#summaryLabel").textContent = months.length > 1
+        ? `${months.length} 個月份結餘`
+        : `${monthLabelFromKey(months[0])} 結餘`;
+      $("#balanceText").textContent = money(income - expense);
+      $("#incomeText").textContent = money(income);
+      $("#expenseText").textContent = money(expense);
+      $("#monthChip").textContent = monthLabel();
+      renderSummaryMonthPicker();
+    }
+    function pill(cat) {
+      const tone = toneById(cat.tone);
+      return `style="background:${tone.bg};color:${tone.ink}"`;
+    }
+    function transactionHTML(tx, showTools = true) {
+      const cat = categoryById(tx.category);
+      const sign = tx.type === "income" ? "+" : "-";
+      const title = (tx.title || "").trim() || cat.name;
+      const detail = [tx.date, tx.note, tx.source === "recurring" ? "固定" : ""].filter(Boolean).join(" · ");
+      return `
+        <article class="item">
+          <div class="item-main">
+            <div class="item-title">
+              <span class="pill" ${pill(cat)}>${cat.name}</span>
+              <strong>${escapeHTML(title)}</strong>
+            </div>
+            <div class="item-sub">${escapeHTML(detail)}</div>
+          </div>
+          <div class="actions">
+            <span class="amount ${tx.type}">${sign}${money(tx.amount)}</span>
+            ${showTools ? `<button class="icon-btn" title="編輯" data-edit-tx="${tx.id}">✎</button><button class="icon-btn" title="刪除" data-delete-tx="${tx.id}">×</button>` : ""}
+          </div>
+        </article>`;
+    }
+    function renderRecent() {
+      const recent = state.transactions.slice(0, 5);
+      $("#recentList").innerHTML = recent.length ? recent.map((tx) => transactionHTML(tx, false)).join("") : `<p class="empty">還沒有正式紀錄。</p>`;
+    }
+    function renderDrafts() {
+      $("#draftCountText").textContent = `${state.drafts.length} 筆備忘`;
+      $("#draftList").innerHTML = state.drafts.length ? state.drafts.map((draft) => {
+        const parsed = parseEntry(draft.text);
+        const cat = categoryById(parsed.category);
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title">
+                <span class="pill" ${pill(cat)}>${cat.name}</span>
+                <strong>${escapeHTML(draft.text)}</strong>
+              </div>
+              <div class="item-sub">${parsed.amount ? `偵測 ${money(parsed.amount)}` : "還沒偵測到金額"} · ${draft.createdAt.slice(0, 10)}</div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" title="轉紀錄" data-convert-draft="${draft.id}">＋</button>
+              <button class="icon-btn" title="刪除" data-delete-draft="${draft.id}">×</button>
+            </div>
+          </article>`;
+      }).join("") : `<p class="empty">這裡會放還沒整理的小備忘。</p>`;
+    }
+    function renderRecords() {
+      const type = $("#filterType").value;
+      const category = $("#filterCategory").value;
+      const month = $("#filterMonth").value;
+      const date = $("#filterDate").value;
+      const limit = $("#filterLimit").value;
+      let records = [...state.transactions];
+      if (type !== "all") records = records.filter((tx) => tx.type === type);
+      if (category !== "all") records = records.filter((tx) => tx.category === category);
+      if (date) {
+        records = records.filter((tx) => tx.date === date);
+      } else if (month) {
+        records = records.filter((tx) => tx.date && tx.date.startsWith(month));
+      }
+      records.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      const filteredIncome = records.filter((tx) => tx.type === "income").reduce((sum, tx) => sum + Number(tx.amount), 0);
+      const filteredExpense = records.filter((tx) => tx.type === "expense").reduce((sum, tx) => sum + Number(tx.amount), 0);
+      const total = records.length;
+      const visibleRecords = limit === "all" ? records : records.slice(0, Number(limit || 100));
+      const limited = visibleRecords.length < total;
+      $("#recordIncomeText").textContent = money(filteredIncome);
+      $("#recordExpenseText").textContent = money(filteredExpense);
+      $("#recordCountText").textContent = total
+        ? `符合 ${total} 筆，目前顯示 ${visibleRecords.length} 筆${limited ? "，可調高顯示筆數" : ""}`
+        : "";
+      $("#recordBalanceText").textContent = total ? `篩選結餘 ${money(filteredIncome - filteredExpense)}` : "";
+      $("#recordList").innerHTML = visibleRecords.length ? visibleRecords.map((tx) => transactionHTML(tx)).join("") : `<p class="empty">沒有符合條件的紀錄。</p>`;
+    }
+    function renderQuickPreview() {
+      const parsed = parseEntry($("#quickText").value);
+      const cat = categoryById(parsed.category);
+      $("#quickPreview").innerHTML = `
+        <div><span>類型</span><strong>${parsed.type === "income" ? "收入" : "支出"}</strong></div>
+        <div><span>金額</span><strong>${parsed.amount ? money(parsed.amount) : "未偵測"}</strong></div>
+        <div><span>分類</span><strong>${cat.name}</strong></div>
+        <div><span>日期</span><strong>${parsed.date}</strong></div>`;
+    }
+    function renderShortcuts() {
+      $("#shortcutChips").innerHTML = getShortcuts().map((item) => `<button class="chip" data-use-shortcut="${item.id}">${escapeHTML(item.name)}</button>`).join("");
+      $("#shortcutList").innerHTML = getShortcuts().map((item) => {
+        const cat = categoryById(item.category);
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title"><span class="pill" ${pill(cat)}>${cat.name}</span><strong>${escapeHTML(item.name)}</strong></div>
+              <div class="item-sub">${item.type === "income" ? "收入" : "支出"} · ${item.amount ? money(item.amount) : "不預填金額"} · ${escapeHTML(item.note || item.name)}</div>
+            </div>
+            <div class="actions">${item.builtIn ? "" : `<button class="icon-btn" title="刪除" data-delete-shortcut="${item.id}">×</button>`}</div>
+          </article>`;
+      }).join("");
+    }
+    function renderCategories() {
+      $("#categoryList").innerHTML = getCategories().map((cat) => {
+        const tone = toneById(cat.tone);
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title"><span class="swatch" style="background:${tone.bg}"></span><strong>${escapeHTML(cat.name)}</strong></div>
+              <div class="item-sub">${(cat.words || []).length ? escapeHTML((cat.words || []).join("、")) : "未設定關鍵字"}</div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" title="編輯" data-edit-category="${cat.id}">✎</button>
+              ${cat.builtIn ? "" : `<button class="icon-btn" title="刪除" data-delete-category="${cat.id}">×</button>`}
+            </div>
+          </article>`;
+      }).join("");
+    }
+    function renderKeywords() {
+      $("#keywordList").innerHTML = getKeywordRules().length ? getKeywordRules().map((rule) => {
+        const cat = categoryById(rule.category);
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title"><span class="pill" ${pill(cat)}>${cat.name}</span><strong>${escapeHTML(rule.keyword)}</strong></div>
+              <div class="item-sub">${rule.type === "income" ? "收入" : "支出"} · ${escapeHTML(rule.note || "無預設備註")}</div>
+            </div>
+            <div class="actions">
+              <button class="icon-btn" title="編輯" data-edit-keyword="${rule.id}">✎</button>
+              <button class="icon-btn" title="刪除" data-delete-keyword="${rule.id}">×</button>
+            </div>
+          </article>`;
+      }).join("") : `<p class="empty">還沒有自訂辨識字詞。</p>`;
+    }
+    function renderRecurring() {
+      $("#recurringList").innerHTML = state.recurring.length ? state.recurring.map((item) => {
+        const cat = categoryById(item.category);
+        const sign = item.type === "income" ? "+" : "-";
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title"><span class="pill" ${pill(cat)}>${cat.name}</span><strong>${escapeHTML(item.name)}</strong></div>
+              <div class="item-sub">每月 ${item.day} 號 · ${escapeHTML(item.note || "無備註")}</div>
+            </div>
+            <div class="actions">
+              <span class="amount ${item.type}">${sign}${money(item.amount)}</span>
+              <button class="switch ${item.active ? "on" : ""}" title="啟用切換" data-toggle-recurring="${item.id}"><span></span></button>
+              <button class="icon-btn" title="刪除" data-delete-recurring="${item.id}">×</button>
+            </div>
+          </article>`;
+      }).join("") : `<p class="empty">還沒有固定項目。</p>`;
+    }
+    function renderReminderSettings() {
+      $("#reminderSettingList").innerHTML = getReminders().map((item) => {
+        const cat = categoryById(item.category);
+        return `
+          <article class="item">
+            <div class="item-main">
+              <div class="item-title"><span class="pill" ${pill(cat)}>${cat.name}</span><strong>${escapeHTML(item.name)}</strong></div>
+              <div class="item-sub">${item.time} 後 · ${item.type === "income" ? "收入" : "支出"} · ${escapeHTML(item.note || item.name)}</div>
+            </div>
+            <div class="actions">
+              <button class="switch ${item.active ? "on" : ""}" title="啟用切換" data-toggle-reminder="${item.id}"><span></span></button>
+              ${item.builtIn ? "" : `<button class="icon-btn" title="刪除" data-delete-reminder="${item.id}">×</button>`}
+            </div>
+          </article>`;
+      }).join("");
+    }
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      const value = parseInt(clean, 16);
+      return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
+    }
+    function budgetLevel(percent) {
+      if (percent >= 100) return 100;
+      if (percent >= 80) return 80;
+      if (percent >= 60) return 60;
+      return 0;
+    }
+    function budgetStyle(cat, level) {
+      const tone = toneById(cat.tone);
+      const rgb = hexToRgb(tone.bg);
+      const alpha = level >= 100 ? .92 : level >= 80 ? .72 : .48;
+      const borderAlpha = level >= 100 ? .88 : level >= 80 ? .62 : .42;
+      return `background:rgba(${rgb.r},${rgb.g},${rgb.b},${alpha});border-color:rgba(${rgb.r},${rgb.g},${rgb.b},${borderAlpha});color:${tone.ink}`;
+    }
+    function budgetUsage(item) {
+      const key = monthKey();
+      const used = state.transactions
+        .filter((tx) => tx.type === "expense" && tx.category === item.category && tx.date && tx.date.startsWith(key))
+        .reduce((sum, tx) => sum + Number(tx.amount || 0), 0);
+      const amount = Number(item.amount || 0);
+      const percent = amount ? (used / amount) * 100 : 0;
+      return { used, amount, percent, level: budgetLevel(percent) };
+    }
+    function budgetCardHTML(item, tools = false) {
+      const cat = categoryById(item.category);
+      const usage = budgetUsage(item);
+      const width = Math.min(100, Math.round(usage.percent));
+      return `
+        <div class="budget-card level-${usage.level}" style="${budgetStyle(cat, usage.level || 60)}">
+          <strong>${escapeHTML(cat.name)} ${usage.level ? "預算提醒" : "預算"}</strong>
+          <p>本月已用 ${money(usage.used)} / ${money(usage.amount)}，${Math.round(usage.percent)}%。</p>
+          <div class="progress"><span style="width:${width}%"></span></div>
+          ${tools ? `<div class="actions"><button class="switch ${item.active ? "on" : ""}" title="啟用切換" data-toggle-budget="${item.id}"><span></span></button><button class="icon-btn" title="刪除" data-delete-budget="${item.id}">×</button></div>` : ""}
+        </div>`;
+    }
+    function budgetAlertChipHTML(item) {
+      const cat = categoryById(item.category);
+      const usage = budgetUsage(item);
+      return `
+        <button class="budget-alert-chip level-${usage.level}" type="button" data-expand-budget-alerts style="${budgetStyle(cat, usage.level || 60)}">
+          <span>${escapeHTML(cat.name)} ${Math.round(usage.percent)}%</span>
+          <small>${money(usage.used)} / ${money(usage.amount)}</small>
+        </button>`;
+    }
+    function renderBudgetAlerts() {
+      const alerts = getBudgets().filter((item) => item.active !== false && budgetUsage(item).level >= 60);
+      $("#budgetAlertBand").style.display = alerts.length ? "block" : "none";
+      if (!alerts.length) {
+        $("#budgetAlertList").innerHTML = "";
+        return;
+      }
+      const expanded = Boolean(state.ui?.budgetAlertsExpanded);
+      $("#budgetAlertList").innerHTML = `
+        <div class="budget-alert-head">
+          <p>${alerts.length} 個分類達到預算提醒</p>
+          <button class="btn" type="button" data-toggle-budget-alerts>${expanded ? "收合" : "展開"}</button>
+        </div>
+        ${expanded
+          ? alerts.map((item) => budgetCardHTML(item)).join("")
+          : `<div class="budget-chip-list">${alerts.map((item) => budgetAlertChipHTML(item)).join("")}</div>`
+        }`;
+    }
+    function renderBudgetSettings() {
+      $("#budgetSettingList").innerHTML = getBudgets().length
+        ? getBudgets().map((item) => budgetCardHTML(item, true)).join("")
+        : `<p class="empty">還沒有分類預算。</p>`;
+    }
+    function renderLazySummaries() {
+      const cards = summaryDueCards();
+      $("#lazySummaryList").innerHTML = cards.length ? cards.map((card) => `
+        <div class="summary-card">
+          <strong>${card.title}</strong>
+          <p>${card.text}</p>
+          <div class="actions">
+            <button class="btn primary" type="button" data-open-summary="${card.kind}">打開總結</button>
+            <button class="btn" type="button" data-dismiss-summary="${card.kind}">這次先不用</button>
+          </div>
+        </div>
+      `).join("") : `<div class="summary-card"><strong>懶人回顧</strong><p>不到提醒時間也可以手動看看週/月總結。</p></div>`;
+    }
+    function renderReminders() {
+      const due = getReminders().filter(reminderDue);
+      $("#reminderBand").style.display = due.length ? "block" : "none";
+      $("#reminderList").innerHTML = due.map((item) => {
+        const cat = categoryById(item.category);
+        return `
+          <div class="reminder-card">
+            <strong>${escapeHTML(item.name)}還沒記</strong>
+            <p>${item.time} 後檢查 · ${cat.name}</p>
+            <div class="actions">
+              <button class="btn primary" data-start-reminder="${item.id}">去補一筆</button>
+              <button class="btn" data-dismiss-reminder="${item.id}">今天不提醒</button>
+            </div>
+          </div>`;
+      }).join("");
+    }
+    function renderSplitRows() {
+      const total = $$(".split-row").reduce((sum, row) => sum + Number(row.querySelector("[data-split-amount]").value || 0), 0);
+      $("#splitTotal").textContent = money(total);
+    }
+    function addSplitRow(name = "", amount = "") {
+      const wrap = document.createElement("div");
+      wrap.className = "split-row";
+      wrap.innerHTML = `
+        <div class="field"><label>項目</label><input data-split-name placeholder="例如：牛肉麵" value="${escapeAttr(name)}"></div>
+        <div class="field"><label>價錢</label><input data-split-amount type="number" min="0" step="0.01" placeholder="0" value="${escapeAttr(amount)}"></div>
+        <button class="icon-btn" title="移除" data-remove-split>×</button>`;
+      $("#splitRows").append(wrap);
+      renderSplitRows();
+    }
+    function renderColorGrid() {
+      $("#categoryColorGrid").innerHTML = palette.map((tone) => `<button class="color-btn ${$("#categoryTone").value === tone.id ? "active" : ""}" type="button" title="${tone.name}" data-pick-tone="${tone.id}" style="background:${tone.bg}"></button>`).join("");
+    }
+    function render() {
+      refreshSelects();
+      renderSummary();
+      renderBudgetAlerts();
+      renderLazySummaries();
+      renderReminders();
+      renderQuickPreview();
+      renderDrafts();
+      renderRecent();
+      renderRecords();
+      renderShortcuts();
+      renderCategories();
+      renderKeywords();
+      renderRecurring();
+      renderReminderSettings();
+      renderBudgetSettings();
+      renderSplitRows();
+      renderColorGrid();
+    }
+
+    function switchView(view) {
+      $$(".view").forEach((panel) => panel.classList.toggle("active", panel.id === `view-${view}`));
+      $$(".nav-btn").forEach((btn) => btn.classList.toggle("active", btn.dataset.view === view));
+    }
+    function switchPane(pane) {
+      $$(".tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.pane === pane));
+      $$(".pane").forEach((panel) => panel.classList.toggle("active", panel.id === `pane-${pane}`));
+    }
+    function switchSettings(pane) {
+      $$(".settings-tab").forEach((tab) => tab.classList.toggle("active", tab.dataset.settings === pane));
+      $$(".settings-pane").forEach((panel) => panel.classList.toggle("active", panel.id === `settings-${pane}`));
+    }
+    function fillForm(entry) {
+      editingItemsTxId = null;
+      $("#saveItemsBtn").textContent = "儲存列表";
+      $("#cancelItemsEditBtn").hidden = true;
+      $("#typeInput").value = entry.type || "expense";
+      $("#amountInput").value = entry.amount || "";
+      $("#categoryInput").value = entry.category || "other";
+      $("#dateInput").value = entry.date || todayISO();
+      $("#titleInput").value = entry.title || "";
+      $("#noteInput").value = entry.note || "";
+      switchPane("manual");
+      switchView("add");
+    }
+    function clearForm() {
+      editingTxId = null;
+      editingItemsTxId = null;
+      $("#saveItemsBtn").textContent = "儲存列表";
+      $("#cancelItemsEditBtn").hidden = true;
+      $("#typeInput").value = "expense";
+      $("#amountInput").value = "";
+      $("#categoryInput").value = "food";
+      $("#dateInput").value = todayISO();
+      $("#titleInput").value = "";
+      $("#noteInput").value = "";
+      $("#manualTitle").textContent = "手動輸入";
+      $("#manualHint").textContent = "可小改再存";
+      $("#transactionSubmitBtn").textContent = "儲存紀錄";
+      $("#cancelEditBtn").hidden = true;
+    }
+    function beginEdit(id) {
+      const tx = state.transactions.find((item) => item.id === id);
+      if (!tx) return;
+      if (Array.isArray(tx.items) && tx.items.length) return beginItemsEdit(id);
+      editingTxId = id;
+      fillForm(tx);
+      $("#manualTitle").textContent = "編輯紀錄";
+      $("#manualHint").textContent = "改好再更新";
+      $("#transactionSubmitBtn").textContent = "更新紀錄";
+      $("#cancelEditBtn").hidden = false;
+    }
+    function clearItemsForm() {
+      editingItemsTxId = null;
+      $("#itemsCategory").value = "food";
+      $("#itemsDate").value = todayISO();
+      $("#itemsTitle").value = "";
+      $("#itemsNote").value = "";
+      $("#splitRows").innerHTML = "";
+      addSplitRow();
+      $("#saveItemsBtn").textContent = "儲存列表";
+      $("#cancelItemsEditBtn").hidden = true;
+    }
+    function listItemLines(items) {
+      return (items || []).map((item) => `${item.name || "未命名"} ${money(item.amount)}`).join("；");
+    }
+    function listSupplementNote(tx) {
+      const lines = listItemLines(tx.items || []);
+      const note = String(tx.note || "");
+      if (!lines) return note;
+      if (note === lines) return "";
+      if (note.endsWith(`｜${lines}`)) return note.slice(0, -(`｜${lines}`).length);
+      return note;
+    }
+    function beginItemsEdit(id) {
+      const tx = state.transactions.find((item) => item.id === id);
+      if (!tx) return;
+      editingItemsTxId = id;
+      $("#itemsCategory").value = tx.category || "food";
+      $("#itemsDate").value = tx.date || todayISO();
+      $("#itemsTitle").value = tx.title || "";
+      $("#itemsNote").value = listSupplementNote(tx);
+      $("#splitRows").innerHTML = "";
+      (tx.items || []).forEach((item) => addSplitRow(item.name || "", item.amount || ""));
+      if (!$$(".split-row").length) addSplitRow();
+      $("#saveItemsBtn").textContent = "更新列表";
+      $("#cancelItemsEditBtn").hidden = false;
+      switchPane("items");
+      switchView("add");
+    }
+    function clearCategoryForm() {
+      editingCategoryId = null;
+      $("#categoryForm").reset();
+      $("#categoryTone").value = "mint";
+      $("#categorySubmitBtn").textContent = "新增分類";
+      $("#cancelCategoryEditBtn").hidden = true;
+      renderColorGrid();
+    }
+    function beginCategoryEdit(id) {
+      const cat = state.categories.find((item) => item.id === id);
+      if (!cat) return;
+      editingCategoryId = id;
+      $("#categoryName").value = cat.name || "";
+      $("#categoryTone").value = cat.tone || "mint";
+      $("#categoryWords").value = (cat.words || []).join(", ");
+      $("#categorySubmitBtn").textContent = "更新分類";
+      $("#cancelCategoryEditBtn").hidden = false;
+      switchView("settings");
+      switchSettings("categories");
+      renderColorGrid();
+    }
+    function clearKeywordForm() {
+      editingKeywordId = null;
+      $("#keywordForm").reset();
+      $("#keywordType").value = "expense";
+      $("#keywordCategory").value = "transport";
+      $("#keywordSubmitBtn").textContent = "新增字詞";
+      $("#cancelKeywordEditBtn").hidden = true;
+    }
+    function beginKeywordEdit(id) {
+      const rule = state.keywordRules.find((item) => item.id === id);
+      if (!rule) return;
+      editingKeywordId = id;
+      $("#keywordText").value = rule.keyword || "";
+      $("#keywordType").value = rule.type || "expense";
+      $("#keywordCategory").value = rule.category || "other";
+      $("#keywordNote").value = rule.note || "";
+      $("#keywordSubmitBtn").textContent = "更新字詞";
+      $("#cancelKeywordEditBtn").hidden = false;
+      switchView("settings");
+      switchSettings("keywords");
+    }
+    function useShortcut(id) {
+      const item = getShortcuts().find((entry) => entry.id === id);
+      if (!item) return;
+      fillForm({
+        type: item.type,
+        amount: item.amount || "",
+        category: item.category,
+        date: todayISO(),
+        title: "",
+        note: item.note || item.name
+      });
+    }
+    function startReminder(id) {
+      const item = getReminders().find((entry) => entry.id === id);
+      if (!item) return;
+      fillForm({ type: item.type, amount: "", category: item.category, date: todayISO(), title: "", note: item.note || item.name });
+    }
+
+    function bindEvents() {
+      $$(".nav-btn").forEach((btn) => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+      $$(".tab").forEach((tab) => tab.addEventListener("click", () => switchPane(tab.dataset.pane)));
+      $$(".settings-tab").forEach((tab) => tab.addEventListener("click", () => switchSettings(tab.dataset.settings)));
+
+      $("#quickText").addEventListener("input", renderQuickPreview);
+      document.body.addEventListener("click", (event) => {
+        const monthBtn = event.target.closest("[data-summary-month]");
+        if (!monthBtn) return;
+        const key = monthBtn.dataset.summaryMonth;
+        if (selectedSummaryMonthKeys.includes(key)) {
+          selectedSummaryMonthKeys = selectedSummaryMonthKeys.filter((item) => item !== key);
+        } else {
+          selectedSummaryMonthKeys = [...selectedSummaryMonthKeys, key].sort().reverse();
+        }
+        if (!selectedSummaryMonthKeys.length) selectedSummaryMonthKeys = [monthKey()];
+        renderSummary();
+      });
+      $$("[data-month-preset]").forEach((btn) => btn.addEventListener("click", () => {
+        const preset = btn.dataset.monthPreset;
+        if (preset === "this") selectedSummaryMonthKeys = [monthKey()];
+        if (preset === "last") selectedSummaryMonthKeys = [monthKey(addMonths(new Date(), -1))];
+        if (preset === "3") selectedSummaryMonthKeys = recentMonthKeys(3);
+        if (preset === "6") selectedSummaryMonthKeys = recentMonthKeys(6);
+        renderSummary();
+      }));
+      $("#closeSummaryModal").addEventListener("click", () => $("#summaryModal").classList.remove("show"));
+      $("#summaryModal").addEventListener("click", (event) => {
+        if (event.target.id === "summaryModal") $("#summaryModal").classList.remove("show");
+      });
+      $("#fillQuickBtn").addEventListener("click", () => fillForm(parseEntry($("#quickText").value)));
+      $("#saveQuickBtn").addEventListener("click", () => {
+        const parsed = parseEntry($("#quickText").value);
+        if (!parsed.note) return showToast("先輸入一句話");
+        if (addTransaction(parsed)) {
+          $("#quickText").value = "";
+          renderQuickPreview();
+          showToast("已儲存");
+        }
+      });
+      $("#saveDraftBtn").addEventListener("click", () => {
+        const text = $("#draftText").value.trim();
+        if (!text) return showToast("先寫一點備忘");
+        state.drafts.unshift({ id: uid("draft"), text, createdAt: new Date().toISOString() });
+        $("#draftText").value = "";
+        saveState();
+        render();
+        showToast("已存到備忘");
+      });
+      $("#parseDraftBtn").addEventListener("click", () => {
+        const text = $("#draftText").value.trim();
+        if (!text) return showToast("先寫一句話");
+        fillForm(parseEntry(text));
+        $("#draftText").value = "";
+      });
+      $("#transactionForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const entry = {
+          type: $("#typeInput").value,
+          amount: $("#amountInput").value,
+          category: $("#categoryInput").value,
+          date: $("#dateInput").value,
+          title: $("#titleInput").value,
+          note: $("#noteInput").value
+        };
+        const wasEditing = Boolean(editingTxId);
+        const ok = wasEditing ? updateTransaction(editingTxId, entry) : addTransaction(entry);
+        if (ok) {
+          clearForm();
+          showToast(wasEditing ? "已更新" : "已儲存");
+        }
+      });
+      $("#clearFormBtn").addEventListener("click", clearForm);
+      $("#cancelEditBtn").addEventListener("click", clearForm);
+
+      $("#addSplitBtn").addEventListener("click", () => addSplitRow());
+      $("#splitRows").addEventListener("input", (event) => {
+        if (event.target.matches("[data-split-amount]")) renderSplitRows();
+      });
+      $("#splitRows").addEventListener("click", (event) => {
+        const remove = event.target.closest("[data-remove-split]");
+        if (!remove) return;
+        remove.closest(".split-row").remove();
+        if (!$$(".split-row").length) addSplitRow();
+        renderSplitRows();
+      });
+      $("#saveItemsBtn").addEventListener("click", () => {
+        const items = $$(".split-row").map((row) => ({
+          name: row.querySelector("[data-split-name]").value.trim(),
+          amount: Number(row.querySelector("[data-split-amount]").value || 0)
+        })).filter((item) => item.name || item.amount);
+        const total = items.reduce((sum, item) => sum + item.amount, 0);
+        const lines = listItemLines(items);
+        const note = [$("#itemsNote").value.trim(), lines].filter(Boolean).join("｜");
+        const entry = { type: "expense", amount: total, category: $("#itemsCategory").value, date: $("#itemsDate").value, title: $("#itemsTitle").value, note, items, source: "manual" };
+        const wasEditing = Boolean(editingItemsTxId);
+        const ok = wasEditing ? updateTransaction(editingItemsTxId, entry) : addTransaction(entry);
+        if (ok) {
+          clearItemsForm();
+          showToast(wasEditing ? "列表已更新" : "列表已儲存");
+        }
+      });
+      $("#cancelItemsEditBtn").addEventListener("click", clearItemsForm);
+      $("#filterType").addEventListener("change", renderRecords);
+      $("#filterCategory").addEventListener("change", renderRecords);
+      $("#filterMonth").addEventListener("change", () => {
+        if ($("#filterMonth").value) $("#filterDate").value = "";
+        renderRecords();
+      });
+      $("#filterDate").addEventListener("change", () => {
+        if ($("#filterDate").value) $("#filterMonth").value = "";
+        renderRecords();
+      });
+      $("#filterLimit").addEventListener("change", renderRecords);
+      $("#clearRecordFiltersBtn").addEventListener("click", () => {
+        $("#filterType").value = "all";
+        $("#filterCategory").value = "all";
+        $("#filterMonth").value = monthKey();
+        $("#filterDate").value = "";
+        $("#filterLimit").value = "100";
+        renderRecords();
+      });
+
+      $("#recurringForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = $("#recurringName").value.trim();
+        const amount = Number($("#recurringAmount").value || 0);
+        const day = Math.max(1, Math.min(31, Number($("#recurringDay").value || 1)));
+        if (!name) return showToast("固定項目要有名稱");
+        if (!amount || amount <= 0) return showToast("金額要大於 0");
+        state.recurring.unshift({
+          id: uid("rec"),
+          name,
+          type: $("#recurringType").value,
+          amount,
+          category: $("#recurringCategory").value,
+          day,
+          note: $("#recurringNote").value.trim(),
+          active: true
+        });
+        $("#recurringForm").reset();
+        $("#recurringDay").value = 1;
+        $("#recurringCategory").value = "income";
+        saveState();
+        processRecurring();
+        render();
+        showToast("已新增固定項目");
+      });
+      $("#categoryForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = $("#categoryName").value.trim();
+        if (!name) return showToast("分類要有名稱");
+        const payload = { name, tone: $("#categoryTone").value || "mint", words: splitWords($("#categoryWords").value) };
+        const existing = state.categories.find((cat) => cat.id === editingCategoryId);
+        if (existing) {
+          Object.assign(existing, payload);
+        } else {
+          state.categories.push({ id: uid("cat"), ...payload, builtIn: false });
+        }
+        const wasEditing = Boolean(existing);
+        clearCategoryForm();
+        saveState();
+        render();
+        showToast(wasEditing ? "已更新分類" : "已新增分類");
+      });
+      $("#cancelCategoryEditBtn").addEventListener("click", clearCategoryForm);
+      $("#keywordForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const keyword = $("#keywordText").value.trim();
+        if (!keyword) return showToast("關鍵字不可空白");
+        const payload = { keyword, type: $("#keywordType").value, category: $("#keywordCategory").value, note: $("#keywordNote").value.trim() };
+        const existing = state.keywordRules.find((rule) => rule.id === editingKeywordId);
+        if (existing) {
+          Object.assign(existing, payload);
+        } else {
+          state.keywordRules.unshift({ id: uid("kw"), ...payload });
+        }
+        const wasEditing = Boolean(existing);
+        clearKeywordForm();
+        saveState();
+        render();
+        showToast(wasEditing ? "已更新字詞" : "已新增字詞");
+      });
+      $("#cancelKeywordEditBtn").addEventListener("click", clearKeywordForm);
+      $("#shortcutForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = $("#shortcutName").value.trim();
+        if (!name) return showToast("快捷要有名稱");
+        state.shortcuts.unshift({
+          id: uid("sc"),
+          name,
+          type: $("#shortcutType").value,
+          category: $("#shortcutCategory").value,
+          amount: $("#shortcutAmount").value,
+          note: $("#shortcutNote").value.trim() || name,
+          builtIn: false
+        });
+        $("#shortcutForm").reset();
+        saveState();
+        render();
+        showToast("已新增快捷");
+      });
+      $("#reminderForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = $("#reminderName").value.trim();
+        if (!name) return showToast("提醒要有名稱");
+        state.reminders.unshift({
+          id: uid("rm"),
+          name,
+          time: $("#reminderTime").value || "12:00",
+          type: $("#reminderType").value,
+          category: $("#reminderCategory").value,
+          note: $("#reminderNote").value.trim() || name,
+          active: true,
+          dismissedDates: [],
+          builtIn: false
+        });
+        $("#reminderForm").reset();
+        $("#reminderTime").value = "12:00";
+        saveState();
+        render();
+        showToast("已新增提醒");
+      });
+      $("#budgetForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const category = $("#budgetCategory").value;
+        const amount = Number($("#budgetAmount").value || 0);
+        if (!category) return showToast("先選分類");
+        if (!amount || amount <= 0) return showToast("預算要大於 0");
+        const existing = state.budgets.find((item) => item.category === category);
+        if (existing) {
+          existing.amount = amount;
+          existing.active = true;
+        } else {
+          state.budgets.unshift({ id: uid("budget"), category, amount, active: true });
+        }
+        $("#budgetForm").reset();
+        saveState();
+        render();
+        showToast(existing ? "已更新預算" : "已新增預算");
+      });
+      $("#exportBackupBtn").addEventListener("click", exportBackup);
+      $("#importBackupBtn").addEventListener("click", () => $("#importBackupInput").click());
+      $("#importBackupInput").addEventListener("change", (event) => {
+        importBackupFile(event.target.files[0]);
+        event.target.value = "";
+      });
+      $("#installPwaBtn").addEventListener("click", async () => {
+        if (!deferredInstallPrompt) return;
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        $("#installPwaBtn").hidden = true;
+      });
+
+      document.body.addEventListener("click", (event) => {
+        const target = event.target;
+        const openSummary = target.closest("[data-open-summary]");
+        if (openSummary) return openSummaryModal(openSummary.dataset.openSummary);
+        const dismissSummary = target.closest("[data-dismiss-summary]");
+        if (dismissSummary) {
+          const kind = dismissSummary.dataset.dismissSummary;
+          state.summaryDismissals[kind] = kind === "month" ? monthKey() : todayISO();
+          saveState();
+          renderLazySummaries();
+          return;
+        }
+        const toggleBudgetAlerts = target.closest("[data-toggle-budget-alerts], [data-expand-budget-alerts]");
+        if (toggleBudgetAlerts) {
+          state.ui = { ...(state.ui || {}), budgetAlertsExpanded: !state.ui?.budgetAlertsExpanded };
+          saveState();
+          renderBudgetAlerts();
+          return;
+        }
+        const editTx = target.closest("[data-edit-tx]");
+        if (editTx) return beginEdit(editTx.dataset.editTx);
+        const deleteTx = target.closest("[data-delete-tx]");
+        if (deleteTx) {
+          state.transactions = state.transactions.filter((tx) => tx.id !== deleteTx.dataset.deleteTx);
+          saveState();
+          render();
+          return showToast("已刪除紀錄");
+        }
+        const convertDraft = target.closest("[data-convert-draft]");
+        if (convertDraft) {
+          const draft = state.drafts.find((item) => item.id === convertDraft.dataset.convertDraft);
+          if (!draft) return;
+          fillForm(parseEntry(draft.text));
+          state.drafts = state.drafts.filter((item) => item.id !== draft.id);
+          saveState();
+          render();
+          return showToast("已填入表單");
+        }
+        const deleteDraft = target.closest("[data-delete-draft]");
+        if (deleteDraft) {
+          state.drafts = state.drafts.filter((draft) => draft.id !== deleteDraft.dataset.deleteDraft);
+          saveState();
+          render();
+          return showToast("已刪除備忘");
+        }
+        const useSc = target.closest("[data-use-shortcut]");
+        if (useSc) return useShortcut(useSc.dataset.useShortcut);
+        const startRm = target.closest("[data-start-reminder]");
+        if (startRm) return startReminder(startRm.dataset.startReminder);
+        const dismissRm = target.closest("[data-dismiss-reminder]");
+        if (dismissRm) return dismissReminder(dismissRm.dataset.dismissReminder);
+        const pickTone = target.closest("[data-pick-tone]");
+        if (pickTone) {
+          $("#categoryTone").value = pickTone.dataset.pickTone;
+          return renderColorGrid();
+        }
+        const editCategory = target.closest("[data-edit-category]");
+        if (editCategory) return beginCategoryEdit(editCategory.dataset.editCategory);
+        const deleteCategory = target.closest("[data-delete-category]");
+        if (deleteCategory) {
+          const id = deleteCategory.dataset.deleteCategory;
+          state.categories = state.categories.filter((cat) => cat.id !== id);
+          state.keywordRules = state.keywordRules.filter((rule) => rule.category !== id);
+          state.shortcuts = state.shortcuts.filter((item) => item.category !== id);
+          state.reminders = state.reminders.filter((item) => item.category !== id);
+          state.transactions.forEach((tx) => { if (tx.category === id) tx.category = "other"; });
+          if (editingCategoryId === id) clearCategoryForm();
+          saveState();
+          render();
+          return showToast("已刪除分類");
+        }
+        const editKeyword = target.closest("[data-edit-keyword]");
+        if (editKeyword) return beginKeywordEdit(editKeyword.dataset.editKeyword);
+        const deleteKeyword = target.closest("[data-delete-keyword]");
+        if (deleteKeyword) {
+          const id = deleteKeyword.dataset.deleteKeyword;
+          state.keywordRules = state.keywordRules.filter((rule) => rule.id !== id);
+          if (editingKeywordId === id) clearKeywordForm();
+          saveState();
+          render();
+          return showToast("已刪除字詞");
+        }
+        const deleteShortcut = target.closest("[data-delete-shortcut]");
+        if (deleteShortcut) {
+          state.shortcuts = state.shortcuts.filter((item) => item.id !== deleteShortcut.dataset.deleteShortcut);
+          saveState();
+          render();
+          return showToast("已刪除快捷");
+        }
+        const toggleBudget = target.closest("[data-toggle-budget]");
+        if (toggleBudget) {
+          const item = state.budgets.find((entry) => entry.id === toggleBudget.dataset.toggleBudget);
+          if (item) {
+            item.active = !item.active;
+            saveState();
+            render();
+          }
+          return;
+        }
+        const deleteBudget = target.closest("[data-delete-budget]");
+        if (deleteBudget) {
+          state.budgets = state.budgets.filter((item) => item.id !== deleteBudget.dataset.deleteBudget);
+          saveState();
+          render();
+          return showToast("已刪除預算");
+        }
+        const toggleRecurring = target.closest("[data-toggle-recurring]");
+        if (toggleRecurring) {
+          const item = state.recurring.find((entry) => entry.id === toggleRecurring.dataset.toggleRecurring);
+          if (item) {
+            item.active = !item.active;
+            saveState();
+            render();
+          }
+          return;
+        }
+        const toggleReminder = target.closest("[data-toggle-reminder]");
+        if (toggleReminder) {
+          const item = state.reminders.find((entry) => entry.id === toggleReminder.dataset.toggleReminder);
+          if (item) {
+            item.active = !item.active;
+            saveState();
+            render();
+          }
+          return;
+        }
+        const deleteReminder = target.closest("[data-delete-reminder]");
+        if (deleteReminder) {
+          state.reminders = state.reminders.filter((item) => item.id !== deleteReminder.dataset.deleteReminder);
+          saveState();
+          render();
+          return showToast("已刪除提醒");
+        }
+        const deleteRecurring = target.closest("[data-delete-recurring]");
+        if (deleteRecurring) {
+          state.recurring = state.recurring.filter((item) => item.id !== deleteRecurring.dataset.deleteRecurring);
+          saveState();
+          render();
+          return showToast("已刪除固定項目");
+        }
+      });
+    }
+
+    function init() {
+      refreshSelects();
+      $("#categoryInput").value = "food";
+      $("#itemsCategory").value = "food";
+      $("#keywordCategory").value = "transport";
+      $("#shortcutCategory").value = "food";
+      $("#reminderCategory").value = "food";
+      $("#budgetCategory").value = "food";
+      $("#recurringCategory").value = "income";
+      $("#dateInput").value = todayISO();
+      $("#itemsDate").value = todayISO();
+      $("#filterMonth").value = monthKey();
+      $("#filterLimit").value = "100";
+      selectedSummaryMonthKeys = [monthKey()];
+      addSplitRow();
+      bindEvents();
+      processRecurring();
+      clearForm();
+      render();
+      setupPwa();
+    }
+    function setupPwa() {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").then(() => {
+          $("#pwaStatusText").textContent = "離線快取已準備。手機瀏覽器可加入主畫面。";
+        }).catch(() => {
+          $("#pwaStatusText").textContent = "PWA 檔案已建立；部署到 HTTPS 後可加入主畫面。";
+        });
+      }
+      window.addEventListener("beforeinstallprompt", (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+        $("#installPwaBtn").hidden = false;
+        $("#pwaStatusText").textContent = "可以安裝成手機主畫面 App。";
+      });
+    }
+    init();
+  </script>
+</body>
+</html>
