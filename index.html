@@ -11,6 +11,12 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <title>茄茄記帳</title>
   <style>
+    @font-face {
+      font-family: "JfOpenHuninn";
+      src: url("./assets/jf-openhuninn-2.1.ttf") format("truetype");
+      font-display: swap;
+    }
+
     :root {
       color-scheme: light;
       --ink: #26313a;
@@ -46,9 +52,21 @@
       --nav-bg: rgba(255, 255, 255, .88);
       --toast-bg: #26313a;
       --toast-ink: #ffffff;
+      --frame-gradient: linear-gradient(135deg, rgba(162, 243, 245, .46), rgba(244, 217, 166, .34) 48%, rgba(223, 166, 180, .36));
+      --frame-wash: linear-gradient(145deg, rgba(162, 243, 245, .14), rgba(244, 217, 166, .08) 35%, rgba(255, 255, 255, 0) 72%);
+      --lace-edge: linear-gradient(90deg, rgba(223, 166, 180, .44), rgba(255, 255, 255, .60) 24%, rgba(255, 255, 255, .60) 76%, rgba(162, 243, 245, .48));
+      --lace-core: linear-gradient(145deg, rgba(255, 255, 255, .74), rgba(255, 255, 255, .48) 52%, rgba(255, 255, 255, .64));
+      --lace-stripes:
+        linear-gradient(90deg, rgba(255, 255, 255, .34), transparent 16%, transparent 84%, rgba(255, 255, 255, .34)),
+        linear-gradient(180deg, rgba(255, 255, 255, .32), transparent 18%, transparent 82%, rgba(255, 255, 255, .32)),
+        repeating-linear-gradient(45deg, rgba(223, 166, 180, .34) 0 8px, transparent 8px 18px),
+        repeating-linear-gradient(-45deg, rgba(162, 243, 245, .36) 0 8px, transparent 8px 18px);
+      --lace-center:
+        repeating-linear-gradient(45deg, rgba(223, 166, 180, .045) 0 8px, transparent 8px 18px),
+        repeating-linear-gradient(-45deg, rgba(162, 243, 245, .05) 0 8px, transparent 8px 18px);
       --shadow: 0 10px 28px rgba(48, 69, 73, .10);
       --radius: 8px;
-      font-family: Inter, "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      font-family: "JfOpenHuninn", "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
     }
 
     :root[data-theme="dark"] {
@@ -74,6 +92,18 @@
       --nav-bg: rgba(18, 24, 26, .92);
       --toast-bg: #f5efe8;
       --toast-ink: #151b1d;
+      --frame-gradient: linear-gradient(135deg, rgba(162, 243, 245, .34), rgba(244, 217, 166, .22) 48%, rgba(223, 166, 180, .24));
+      --frame-wash: linear-gradient(145deg, rgba(162, 243, 245, .10), rgba(244, 217, 166, .06) 35%, rgba(14, 20, 22, 0) 72%);
+      --lace-edge: linear-gradient(90deg, rgba(223, 166, 180, .22), rgba(18, 29, 32, .74) 24%, rgba(18, 29, 32, .74) 76%, rgba(162, 243, 245, .24));
+      --lace-core: linear-gradient(145deg, rgba(18, 29, 32, .84), rgba(16, 22, 24, .76) 52%, rgba(22, 28, 31, .84));
+      --lace-stripes:
+        linear-gradient(90deg, rgba(255, 255, 255, .08), transparent 16%, transparent 84%, rgba(255, 255, 255, .08)),
+        linear-gradient(180deg, rgba(255, 255, 255, .07), transparent 18%, transparent 82%, rgba(255, 255, 255, .07)),
+        repeating-linear-gradient(45deg, rgba(223, 166, 180, .20) 0 8px, transparent 8px 18px),
+        repeating-linear-gradient(-45deg, rgba(162, 243, 245, .22) 0 8px, transparent 8px 18px);
+      --lace-center:
+        repeating-linear-gradient(45deg, rgba(223, 166, 180, .055) 0 8px, transparent 8px 18px),
+        repeating-linear-gradient(-45deg, rgba(162, 243, 245, .06) 0 8px, transparent 8px 18px);
       --shadow: 0 14px 30px rgba(0, 0, 0, .30);
     }
 
@@ -129,6 +159,11 @@
       border-color: rgba(244, 217, 166, .35);
       box-shadow: 0 12px 28px rgba(0, 0, 0, .24);
     }
+    :root[data-theme="dark"] #reminderBand::after {
+      background:
+        linear-gradient(145deg, rgba(244, 217, 166, .08), rgba(44, 36, 22, .88)),
+        linear-gradient(180deg, #241f17, #332817);
+    }
     :root[data-theme="dark"] #reminderBand .section-head p,
     :root[data-theme="dark"] #reminderBand .reminder-card p {
       color: rgba(255, 240, 199, .78);
@@ -157,8 +192,17 @@
       margin: 0;
       min-height: 100vh;
       color: var(--ink);
-      background: var(--app-bg);
+      background:
+        linear-gradient(180deg, rgba(247, 251, 249, .66), rgba(255, 248, 241, .52) 52%, rgba(247, 250, 252, .66)),
+        url("./assets/qieqie-watercolor-bg.png") center top / cover fixed,
+        var(--app-bg);
       letter-spacing: 0;
+    }
+    :root[data-theme="dark"] body {
+      background:
+        linear-gradient(180deg, rgba(10, 15, 17, .86), rgba(17, 20, 21, .84) 52%, rgba(12, 17, 18, .88)),
+        url("./assets/qieqie-watercolor-bg.png") center top / cover fixed,
+        var(--app-bg);
     }
     button, input, select, textarea { font: inherit; }
     button { border: 0; cursor: pointer; color: inherit; }
@@ -175,6 +219,13 @@
       align-items: center;
       gap: 12px;
       padding: 8px 0 14px;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      min-width: 0;
     }
     .brand h1 {
       margin: 0;
@@ -200,20 +251,99 @@
       border: 1px solid rgba(21, 173, 193, .24);
       box-shadow: 0 6px 16px rgba(65, 93, 101, .08);
     }
+    .theme-toggle {
+      width: 44px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: var(--oc-teal-ink);
+      background: var(--surface-pop);
+      border: 1px solid rgba(21, 173, 193, .24);
+      box-shadow: 0 6px 16px rgba(65, 93, 101, .08);
+      font-size: 16px;
+      font-weight: 900;
+    }
+    .theme-toggle::before { content: "☾"; }
+    .theme-toggle.on::before { content: "☀"; }
 
     .view, .pane, .settings-pane { display: none; }
     .view.active, .pane.active, .settings-pane.active { display: block; }
 
+    .hero, .band, .item, .modal {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      background: var(--lace-edge);
+      border: 1px solid rgba(255, 255, 255, .42);
+    }
+    .hero::before, .band::before, .item::before, .modal::before,
+    .hero::after, .band::after, .item::after, .modal::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      border-radius: inherit;
+    }
+    .hero::before, .band::before, .item::before, .modal::before {
+      inset: 0;
+      z-index: -2;
+      padding: 7px;
+      background: var(--lace-stripes);
+      opacity: .88;
+      -webkit-mask:
+        linear-gradient(#000 0 0) content-box,
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .hero::after, .band::after, .item::after, .modal::after {
+      inset: 8px;
+      z-index: -1;
+      background:
+        var(--frame-wash),
+        var(--lace-core);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .40);
+    }
+    .hero > *, .band > *, .item > *, .modal > * {
+      position: relative;
+      z-index: 1;
+    }
+    .hero::after {
+      background:
+        var(--frame-wash),
+        var(--hero-bg);
+    }
+    .band::after {
+      background:
+        var(--lace-center),
+        var(--frame-wash),
+        linear-gradient(180deg, var(--surface-bg), var(--surface-bg));
+    }
+    .item::after {
+      inset: 6px;
+      background:
+        var(--frame-wash),
+        linear-gradient(180deg, var(--field-bg), var(--field-bg));
+    }
+    .modal::after {
+      background:
+        var(--lace-center),
+        var(--frame-wash),
+        linear-gradient(180deg, var(--paper), var(--paper));
+    }
     .hero {
       padding: 16px;
       border-radius: var(--radius);
-      background: var(--hero-bg);
-      border: 1px solid rgba(129, 159, 154, .25);
       box-shadow: var(--shadow);
     }
     #reminderBand {
       background: #fff4c8;
       border-color: #edd27b;
+    }
+    #reminderBand::after {
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, .20), rgba(255, 244, 200, .84)),
+        linear-gradient(180deg, #fff8d9, #fff0bb);
     }
     #reminderBand .section-head p { color: #725b15; }
     .hero-label {
@@ -306,8 +436,6 @@
       margin-top: 16px;
       padding: 14px;
       border-radius: var(--radius);
-      background: var(--surface-bg);
-      border: 1px solid var(--line);
       box-shadow: 0 8px 18px rgba(46, 64, 70, .06);
     }
     .section-head {
@@ -352,6 +480,43 @@
     textarea {
       min-height: 86px;
       resize: vertical;
+    }
+    .voice-field {
+      position: relative;
+    }
+    .voice-field textarea {
+      padding-right: 48px;
+    }
+    .voice-btn {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #aeb8bb;
+      background: rgba(236, 240, 241, .70);
+      border: 1px solid rgba(180, 190, 194, .38);
+      box-shadow: 0 4px 10px rgba(48, 69, 73, .06);
+    }
+    .voice-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+    .voice-btn.listening {
+      color: var(--oc-teal-ink);
+      background: rgba(162, 243, 245, .78);
+      border-color: rgba(21, 173, 193, .32);
+    }
+    :root[data-theme="dark"] .voice-btn {
+      color: #91a0a4;
+      background: rgba(30, 40, 43, .82);
+      border-color: rgba(162, 243, 245, .14);
     }
     input:focus, select:focus, textarea:focus {
       border-color: var(--focus-color);
@@ -408,7 +573,7 @@
       background: linear-gradient(135deg, rgba(162, 243, 245, .34), rgba(244, 217, 166, .30) 52%, rgba(223, 166, 180, .22));
     }
     .tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .settings-tabs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .settings-tabs { grid-template-columns: repeat(auto-fit, minmax(64px, 1fr)); }
     .tab, .settings-tab {
       min-height: 38px;
       border-radius: 6px;
@@ -524,8 +689,26 @@
       align-items: center;
       padding: 11px;
       border-radius: var(--radius);
-      background: var(--field-bg);
-      border: 1px solid var(--line);
+    }
+    #recentList .item,
+    #recordList .item {
+      border-color: rgba(21, 173, 193, .22);
+      background: linear-gradient(90deg, rgba(223, 166, 180, .24), rgba(255, 255, 255, .52) 28%, rgba(255, 255, 255, .52) 72%, rgba(162, 243, 245, .28));
+    }
+    #recentList .item::before,
+    #recordList .item::before {
+      padding: 3px;
+      opacity: .62;
+    }
+    #recentList .item::after,
+    #recordList .item::after {
+      inset: 4px;
+      box-shadow: inset 0 0 0 1px rgba(21, 173, 193, .10);
+    }
+    :root[data-theme="dark"] #recentList .item,
+    :root[data-theme="dark"] #recordList .item {
+      border-color: rgba(162, 243, 245, .20);
+      background: linear-gradient(90deg, rgba(223, 166, 180, .16), rgba(18, 29, 32, .70) 28%, rgba(18, 29, 32, .70) 72%, rgba(162, 243, 245, .18));
     }
     .item-main { min-width: 0; }
     .item-title {
@@ -735,14 +918,23 @@
       height: 8px;
       margin-top: 10px;
       border-radius: 999px;
-      background: var(--surface-soft);
+      background: rgba(255, 255, 255, .34);
+      border: 1px solid var(--budget-bar-border, rgba(89, 99, 108, .24));
+      box-shadow: inset 0 1px 2px rgba(48, 69, 73, .12);
       overflow: hidden;
     }
     .progress span {
       display: block;
       height: 100%;
       border-radius: inherit;
-      background: var(--muted);
+      background: linear-gradient(90deg, var(--budget-bar, var(--muted)), var(--budget-bar-strong, var(--budget-bar, var(--muted))));
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 255, 255, .22),
+        0 0 0 1px var(--budget-bar-border, rgba(89, 99, 108, .20));
+    }
+    :root[data-theme="dark"] .progress {
+      background: rgba(7, 13, 15, .48);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, .28);
     }
     .modal-backdrop {
       position: fixed;
@@ -762,8 +954,6 @@
       overflow: auto;
       padding: 16px;
       border-radius: var(--radius);
-      background: var(--paper);
-      border: 1px solid var(--line);
       box-shadow: var(--shadow);
     }
     .modal h2 {
@@ -861,7 +1051,10 @@
         <h1>茄茄記帳</h1>
         <span>先記住，再慢慢整理</span>
       </div>
-      <div class="month-chip" id="monthChip"></div>
+      <div class="top-actions">
+        <div class="month-chip" id="monthChip"></div>
+        <button class="theme-toggle" id="darkModeSwitch" title="切換深色模式" type="button" aria-label="切換深色模式"></button>
+      </div>
     </header>
 
     <section class="view active" id="view-home">
@@ -926,7 +1119,17 @@
         </div>
         <div class="field">
           <label for="draftText">備忘內容</label>
-          <textarea id="draftText" placeholder="例如：午餐便當 95，或 咖啡 60 請朋友"></textarea>
+          <div class="voice-field">
+            <textarea id="draftText" placeholder="例如：午餐便當 95，或 咖啡 60 請朋友"></textarea>
+            <button class="voice-btn" id="draftVoiceBtn" type="button" title="語音錄入" aria-label="語音錄入">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Z"></path>
+                <path d="M19 10a7 7 0 0 1-14 0"></path>
+                <path d="M12 17v4"></path>
+                <path d="M8 21h8"></path>
+              </svg>
+            </button>
+          </div>
         </div>
         <div class="actions">
           <button class="btn primary" id="saveDraftBtn">存到備忘</button>
@@ -1109,7 +1312,6 @@
           <button class="settings-tab" data-settings="shortcuts">快捷</button>
           <button class="settings-tab" data-settings="reminders">提醒</button>
           <button class="settings-tab" data-settings="budgets">預算</button>
-          <button class="settings-tab" data-settings="appearance">外觀</button>
           <button class="settings-tab" data-settings="backup">備份</button>
         </div>
 
@@ -1251,7 +1453,8 @@
               <input id="shortcutNote" placeholder="預設用名稱">
             </div>
             <div class="actions wide">
-              <button class="btn primary" type="submit">新增快捷</button>
+              <button class="btn primary" type="submit" id="shortcutSubmitBtn">新增快捷</button>
+              <button class="btn warn" type="button" id="cancelShortcutEditBtn" hidden>取消編輯</button>
             </div>
           </form>
           <div class="list" id="shortcutList"></div>
@@ -1316,36 +1519,6 @@
             </div>
           </form>
           <div class="list" id="budgetSettingList"></div>
-        </div>
-
-        <div class="settings-pane" id="settings-appearance">
-          <div class="section-head">
-            <div>
-              <h2>外觀設定</h2>
-              <p>切換深色模式；輸入框 focus 會隨機使用 OC 四色。</p>
-            </div>
-          </div>
-          <div class="list">
-            <article class="item">
-              <div class="item-main">
-                <div class="item-title"><strong>深色模式</strong></div>
-                <div class="item-sub">適合夜間使用，設定會保存在本機。</div>
-              </div>
-              <button class="switch" id="darkModeSwitch" title="切換深色模式" type="button"><span></span></button>
-            </article>
-            <article class="item">
-              <div class="item-main">
-                <div class="item-title"><strong>Focus 互動色</strong></div>
-                <div class="item-sub">每次點進輸入框，會在青、水、玫、金四色中隨機切換。</div>
-              </div>
-              <div class="focus-demo" aria-hidden="true">
-                <span style="background:#15ADC1"></span>
-                <span style="background:#A2F3F5"></span>
-                <span style="background:#DFA6B4"></span>
-                <span style="background:#F4D9A6"></span>
-              </div>
-            </article>
-          </div>
         </div>
 
         <div class="settings-pane" id="settings-backup">
@@ -1416,6 +1589,7 @@
       { id: "mint", name: "薄荷", bg: "#ccebdc", ink: "#2f6d55" },
       { id: "blue", name: "淡藍", bg: "#b8dff4", ink: "#2d647e" },
       { id: "lav", name: "淡紫", bg: "#ddd4f3", ink: "#62508b" },
+      { id: "periwinkle", name: "粉藍紫", bg: "#C7D2FF", ink: "#4A568A" },
       { id: "lemon", name: "奶黃", bg: "#ffe9a8", ink: "#715b17" },
       { id: "rose", name: "粉玫", bg: "#ffd5dd", ink: "#854d5b" },
       { id: "gray", name: "淺灰", bg: "#e8ecef", ink: "#59636c" }
@@ -1458,6 +1632,9 @@
     let editingItemsTxId = null;
     let editingCategoryId = null;
     let editingKeywordId = null;
+    let editingShortcutId = null;
+    let draftRecognition = null;
+    let draftVoiceListening = false;
     let toastTimer = null;
     let deferredInstallPrompt = null;
 
@@ -1641,6 +1818,7 @@
         clearItemsForm();
         clearCategoryForm();
         clearKeywordForm();
+        clearShortcutForm();
         applyTheme();
         render();
         showToast("已匯入備份");
@@ -2019,7 +2197,10 @@
               <div class="item-title"><span class="pill" ${pill(cat)}>${cat.name}</span><strong>${escapeHTML(item.name)}</strong></div>
               <div class="item-sub">${item.type === "income" ? "收入" : "支出"} · ${item.amount ? money(item.amount) : "不預填金額"} · ${escapeHTML(item.note || item.name)}</div>
             </div>
-            <div class="actions">${item.builtIn ? "" : `<button class="icon-btn" title="刪除" data-delete-shortcut="${item.id}">×</button>`}</div>
+            <div class="actions">
+              <button class="icon-btn" title="編輯" data-edit-shortcut="${item.id}">✎</button>
+              ${item.builtIn ? "" : `<button class="icon-btn" title="刪除" data-delete-shortcut="${item.id}">×</button>`}
+            </div>
           </article>`;
       }).join("");
     }
@@ -2105,7 +2286,12 @@
       const rgb = hexToRgb(tone.bg);
       const alpha = level >= 100 ? .92 : level >= 80 ? .72 : .48;
       const borderAlpha = level >= 100 ? .88 : level >= 80 ? .62 : .42;
-      return `background:rgba(${rgb.r},${rgb.g},${rgb.b},${alpha});border-color:rgba(${rgb.r},${rgb.g},${rgb.b},${borderAlpha});color:${tone.ink}`;
+      const barRgb = {
+        r: Math.max(0, Math.round(rgb.r * .78)),
+        g: Math.max(0, Math.round(rgb.g * .78)),
+        b: Math.max(0, Math.round(rgb.b * .78))
+      };
+      return `--budget-bar:${tone.bg};--budget-bar-strong:rgb(${barRgb.r},${barRgb.g},${barRgb.b});--budget-bar-border:rgba(${barRgb.r},${barRgb.g},${barRgb.b},.46);background:rgba(${rgb.r},${rgb.g},${rgb.b},${alpha});border-color:rgba(${rgb.r},${rgb.g},${rgb.b},${borderAlpha});color:${tone.ink}`;
     }
     function budgetUsage(item) {
       const key = monthKey();
@@ -2360,6 +2546,28 @@
       switchView("settings");
       switchSettings("keywords");
     }
+    function clearShortcutForm() {
+      editingShortcutId = null;
+      $("#shortcutForm").reset();
+      $("#shortcutType").value = "expense";
+      $("#shortcutCategory").value = "food";
+      $("#shortcutSubmitBtn").textContent = "新增快捷";
+      $("#cancelShortcutEditBtn").hidden = true;
+    }
+    function beginShortcutEdit(id) {
+      const item = state.shortcuts.find((entry) => entry.id === id);
+      if (!item) return;
+      editingShortcutId = id;
+      $("#shortcutName").value = item.name || "";
+      $("#shortcutType").value = item.type || "expense";
+      $("#shortcutCategory").value = item.category || "food";
+      $("#shortcutAmount").value = item.amount || "";
+      $("#shortcutNote").value = item.note || "";
+      $("#shortcutSubmitBtn").textContent = "更新快捷";
+      $("#cancelShortcutEditBtn").hidden = false;
+      switchView("settings");
+      switchSettings("shortcuts");
+    }
     function useShortcut(id) {
       const item = getShortcuts().find((entry) => entry.id === id);
       if (!item) return;
@@ -2376,6 +2584,53 @@
       const item = getReminders().find((entry) => entry.id === id);
       if (!item) return;
       fillForm({ type: item.type, amount: "", category: item.category, date: todayISO(), title: "", note: item.note || item.name });
+    }
+    function setDraftVoiceState(active) {
+      draftVoiceListening = active;
+      const button = $("#draftVoiceBtn");
+      if (!button) return;
+      button.classList.toggle("listening", active);
+      button.setAttribute("aria-pressed", active ? "true" : "false");
+      button.title = active ? "停止語音錄入" : "語音錄入";
+    }
+    function appendDraftText(text) {
+      const cleaned = String(text || "").trim();
+      if (!cleaned) return;
+      const input = $("#draftText");
+      const joiner = input.value.trim() ? " " : "";
+      input.value = `${input.value}${joiner}${cleaned}`;
+      input.focus();
+    }
+    function toggleDraftVoiceInput() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) return showToast("這個瀏覽器暫時不支援語音錄入");
+      if (draftVoiceListening && draftRecognition) {
+        draftRecognition.stop();
+        return;
+      }
+      draftRecognition = new SpeechRecognition();
+      draftRecognition.lang = "zh-HK";
+      draftRecognition.interimResults = false;
+      draftRecognition.continuous = false;
+      draftRecognition.onstart = () => setDraftVoiceState(true);
+      draftRecognition.onend = () => setDraftVoiceState(false);
+      draftRecognition.onerror = (event) => {
+        setDraftVoiceState(false);
+        if (event.error !== "no-speech" && event.error !== "aborted") showToast("語音錄入沒有成功");
+      };
+      draftRecognition.onresult = (event) => {
+        const transcript = Array.from(event.results)
+          .slice(event.resultIndex)
+          .map((result) => result[0]?.transcript || "")
+          .join("");
+        appendDraftText(transcript);
+      };
+      try {
+        draftRecognition.start();
+      } catch (error) {
+        setDraftVoiceState(false);
+        showToast("語音錄入沒有成功");
+      }
     }
 
     function bindEvents() {
@@ -2441,6 +2696,7 @@
         fillForm(parseEntry(text));
         $("#draftText").value = "";
       });
+      $("#draftVoiceBtn")?.addEventListener("click", toggleDraftVoiceInput);
       $("#transactionForm").addEventListener("submit", (event) => {
         event.preventDefault();
         const entry = {
@@ -2575,20 +2831,26 @@
         event.preventDefault();
         const name = $("#shortcutName").value.trim();
         if (!name) return showToast("快捷要有名稱");
-        state.shortcuts.unshift({
-          id: uid("sc"),
+        const payload = {
           name,
           type: $("#shortcutType").value,
           category: $("#shortcutCategory").value,
           amount: $("#shortcutAmount").value,
-          note: $("#shortcutNote").value.trim() || name,
-          builtIn: false
-        });
-        $("#shortcutForm").reset();
+          note: $("#shortcutNote").value.trim() || name
+        };
+        const existing = state.shortcuts.find((item) => item.id === editingShortcutId);
+        if (existing) {
+          Object.assign(existing, payload);
+        } else {
+          state.shortcuts.unshift({ id: uid("sc"), ...payload, builtIn: false });
+        }
+        const wasEditing = Boolean(existing);
+        clearShortcutForm();
         saveState();
         render();
-        showToast("已新增快捷");
+        return showToast(wasEditing ? "已更新快捷" : "已新增快捷");
       });
+      $("#cancelShortcutEditBtn").addEventListener("click", clearShortcutForm);
       $("#reminderForm").addEventListener("submit", (event) => {
         event.preventDefault();
         const name = $("#reminderName").value.trim();
@@ -2689,6 +2951,8 @@
         }
         const useSc = target.closest("[data-use-shortcut]");
         if (useSc) return useShortcut(useSc.dataset.useShortcut);
+        const editShortcut = target.closest("[data-edit-shortcut]");
+        if (editShortcut) return beginShortcutEdit(editShortcut.dataset.editShortcut);
         const startRm = target.closest("[data-start-reminder]");
         if (startRm) return startReminder(startRm.dataset.startReminder);
         const dismissRm = target.closest("[data-dismiss-reminder]");
@@ -2726,7 +2990,9 @@
         }
         const deleteShortcut = target.closest("[data-delete-shortcut]");
         if (deleteShortcut) {
-          state.shortcuts = state.shortcuts.filter((item) => item.id !== deleteShortcut.dataset.deleteShortcut);
+          const id = deleteShortcut.dataset.deleteShortcut;
+          state.shortcuts = state.shortcuts.filter((item) => item.id !== id);
+          if (editingShortcutId === id) clearShortcutForm();
           saveState();
           render();
           return showToast("已刪除快捷");

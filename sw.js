@@ -1,9 +1,11 @@
-const CACHE_NAME = "qieqie-ledger-v6";
+const CACHE_NAME = "qieqie-ledger-v11";
 const APP_ASSETS = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./assets/jf-openhuninn-2.1.ttf",
+  "./assets/qieqie-watercolor-bg.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/maskable-192.png",
