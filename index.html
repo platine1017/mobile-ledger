@@ -1038,8 +1038,8 @@
       left: 0;
       top: 0;
       z-index: 18;
-      width: 92px;
-      height: 76px;
+      width: 96px;
+      height: 80px;
       image-rendering: pixelated;
       pointer-events: auto;
       touch-action: none;
@@ -1601,7 +1601,7 @@
 
   <script>
     const STORAGE_KEY = "tiny-ledger-v1";
-    const APP_BUILD = "mascot-animated-v4";
+    const APP_BUILD = "mascot-animated-v6";
     const palette = [
       { id: "oc-aqua", name: "青藍", bg: "#A2F3F5", ink: "#075e68" },
       { id: "oc-teal", name: "深青", bg: "#15ADC1", ink: "#ffffff" },
@@ -1871,6 +1871,8 @@
         this.stateStarted = 0;
         this.stateUntil = 0;
         this.pauseUntil = 0;
+        this.nextSleepAt = 0;
+        this.lastActivityAt = 0;
         this.lastTime = 0;
         this.drag = null;
         this.hidden = true;
@@ -1886,11 +1888,18 @@
         });
         this.bindDrag();
         this.updateBounds();
+        this.noteActivity(performance.now());
         requestAnimationFrame((time) => this.loop(time));
+      }
+      noteActivity(now = performance.now()) {
+        this.lastActivityAt = now;
+        this.nextSleepAt = now + 9000 + Math.random() * 5000;
       }
       bindDrag() {
         this.canvas.addEventListener("pointerdown", (event) => {
           if (this.hidden) return;
+          const now = performance.now();
+          this.noteActivity(now);
           this.canvas.setPointerCapture?.(event.pointerId);
           this.drag = {
             id: event.pointerId,
@@ -1898,10 +1907,11 @@
             startY: event.clientY,
             offsetX: event.clientX - this.x,
             offsetY: event.clientY - this.y,
+            wasSleeping: this.state === "sleep",
             moved: false
           };
           this.state = "drag";
-          this.stateStarted = performance.now();
+          this.stateStarted = now;
           this.stateUntil = 0;
           this.canvas.classList.add("dragging");
           event.preventDefault();
@@ -1919,18 +1929,26 @@
         const endDrag = (event) => {
           if (!this.drag || event.pointerId !== this.drag.id) return;
           const wasClick = !this.drag.moved;
+          const wasSleeping = this.drag.wasSleeping;
           this.canvas.releasePointerCapture?.(event.pointerId);
           this.canvas.classList.remove("dragging");
           this.drag = null;
           if (wasClick) {
-            this.trigger("poke", { force: true });
+            if (wasSleeping && Math.random() < .42) {
+              this.state = "sleep";
+              this.stateStarted = performance.now();
+              this.stateUntil = 0;
+            } else {
+              this.trigger("poke", { force: true });
+            }
           } else if (this.shouldPeek()) {
             this.state = "peek";
             this.stateUntil = 0;
           } else {
-            this.state = "pause";
-            this.pauseUntil = performance.now() + 900;
-            this.stateUntil = 0;
+            const now = performance.now();
+            this.state = "drowsy";
+            this.stateStarted = now;
+            this.stateUntil = now + 1500;
           }
           event.preventDefault();
         };
@@ -1980,6 +1998,7 @@
         this.canvas.style.transform = `translate3d(${Math.round(this.x)}px, ${Math.round(this.y)}px, 0)`;
       }
       setView(view) {
+        this.noteActivity();
         this.view = view;
         this.hidden = false;
         this.canvas.classList.toggle("hidden", this.hidden);
@@ -2006,12 +2025,13 @@
       }
       trigger(state, options = {}) {
         const now = performance.now();
+        this.noteActivity(now);
         const cooldown = { overBudget: 10000, thinking: 7000, celebrate: 14000, success: 900 }[state] || 0;
         if (!options.force && cooldown && this.cooldowns[state] && now - this.cooldowns[state] < cooldown) return;
         const priority = { walk: 0, pause: 0, peek: 0, thinking: 1, poke: 2, success: 3, celebrate: 3, overBudget: 4, drag: 5 };
         if (!options.force && this.stateUntil && now < this.stateUntil && (priority[state] || 0) < (priority[this.state] || 0)) return;
         this.cooldowns[state] = now;
-        const durations = { poke: 1500, success: 1500, overBudget: 1200, thinking: 2600, celebrate: 2200 };
+        const durations = { poke: 1500, success: 1500, overBudget: 1200, thinking: 2600, celebrate: 2200, drowsy: 1500 };
         this.state = state;
         this.stateStarted = now;
         this.stateUntil = now + (durations[state] || 1200);
@@ -2046,6 +2066,18 @@
           this.place();
           return;
         }
+        const canSleep = this.state === "walk" || this.state === "pause" || this.state === "drowsy";
+        if (canSleep && time > this.nextSleepAt) {
+          this.state = "sleep";
+          this.stateStarted = time;
+          this.stateUntil = 0;
+          this.place();
+          return;
+        }
+        if (this.state === "sleep") {
+          this.place();
+          return;
+        }
         if (this.stateUntil && time > this.stateUntil) {
           this.state = Math.random() < .25 ? "pause" : "walk";
           this.stateUntil = 0;
@@ -2058,7 +2090,7 @@
         }
         let speed = this.speed;
         if (this.state === "poke") speed = 1.45;
-        if (this.state === "success" || this.state === "overBudget" || this.state === "celebrate" || this.state === "thinking") speed = 0;
+        if (this.state === "success" || this.state === "overBudget" || this.state === "celebrate" || this.state === "thinking" || this.state === "drowsy") speed = 0;
         if (speed) {
           this.x += this.dir * speed * (dt / 16.67);
           if (this.state === "poke") {
@@ -2111,6 +2143,17 @@
         this.px(32, 6, 4, 4, "#8ac8e8");
         this.px(40, 6, 4, 4, "#8ac8e8");
       }
+      drawSleepZ(time) {
+        const drift = Math.floor((time / 500) % 3) * 4;
+        const color = "rgba(47, 112, 128, .72)";
+        this.px(62, 0 + drift, 12, 3, color);
+        this.px(70, 3 + drift, 4, 3, color);
+        this.px(66, 6 + drift, 4, 3, color);
+        this.px(62, 9 + drift, 12, 3, color);
+        this.px(76, 16 + drift, 8, 3, color);
+        this.px(80, 19 + drift, 4, 3, color);
+        this.px(76, 22 + drift, 8, 3, color);
+      }
       drawCrown() {
         const gold = "#f5c94a";
         this.px(35, 4, 5, 12, gold);
@@ -2140,6 +2183,18 @@
         if (mode === "blink") {
           this.px(startX + 6 * cell, startY + 4 * cell, cell * 2, cell, "#111");
           this.px(startX + 16 * cell, startY + 4 * cell, cell * 2, cell, "#111");
+          return;
+        }
+        if (mode === "drowsy") {
+          this.px(startX + 6 * cell, startY + 4 * cell, cell * 2, cell, "#111");
+          this.px(startX + 16 * cell, startY + 4 * cell, cell * 2, cell, "#111");
+          this.px(startX + 7 * cell, startY + 5 * cell, cell, cell, "#111");
+          this.px(startX + 17 * cell, startY + 5 * cell, cell, cell, "#111");
+          return;
+        }
+        if (mode === "sleep") {
+          this.px(startX + 6 * cell, startY + 5 * cell, cell * 2, cell, "#111");
+          this.px(startX + 16 * cell, startY + 5 * cell, cell * 2, cell, "#111");
           return;
         }
         this.px(startX + 6 * cell, startY + 3 * cell, cell, cell * 3, "#111");
@@ -2173,6 +2228,11 @@
         if (this.state === "pause" && Math.floor(time / 850) % 6 === 0) eye = "blink";
         if (this.state === "drag") eye = "drag";
         if (this.state === "thinking") eye = "blink";
+        if (this.state === "drowsy") eye = "drowsy";
+        if (this.state === "sleep") {
+          eye = "sleep";
+          bob = Math.sin(time / 900) * .8;
+        }
         if (this.state === "overBudget") {
           body = Math.floor(time / 90) % 2 ? "#e85f58" : "#f18b72";
           eye = "scared";
@@ -2198,8 +2258,10 @@
         const startX = 0;
         const startY = 8;
         const colors = { B: body };
+        const drawX = Math.round(48 + shake);
+        const drawY = Math.round(45 + bob);
         this.ctx.save();
-        this.ctx.translate(48 + shake, 45 + bob);
+        this.ctx.translate(drawX, drawY);
         this.ctx.rotate(rotation);
         this.ctx.translate(-48, -45);
         this.px(27, 70, 44, 5, "rgba(78,63,50,.36)");
@@ -2222,6 +2284,7 @@
         this.drawEye(eye, startX, startY, cell);
         this.ctx.restore();
         if (this.state === "thinking") this.drawBubble();
+        if (this.state === "sleep") this.drawSleepZ(time);
         if (this.goodBalance || this.state === "celebrate") this.drawCrown();
         if (this.state === "poke") this.drawQuestion(39, 0, "#2fb8e8");
         if (this.state === "success") {
